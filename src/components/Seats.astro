@@ -18,7 +18,9 @@ const article = (word: string) => (/^[aeiou]/i.test(word) ? 'an' : 'a');
       <p class="caption label">
         <span class="n">Seat {i + 1}</span>
         {seat
-          ? <span>Taken: {seat.name ?? `${article(seat.industry)} ${seat.industry}`} in {seat.city}</span>
+          ? seat.own
+            ? <span>Taken: {seat.name}, our own brand</span>
+            : <span>Taken: {seat.name ?? `${article(seat.industry)} ${seat.industry}`} in {seat.city}</span>
           : <span>Open</span>}
       </p>
     </li>
