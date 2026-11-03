@@ -1,0 +1,37 @@
+[
+  {
+    "id": "pricing",
+    "q": "What is founder pricing?",
+    "a": "A lower fee than we'll charge once we have a portfolio. We quote it after the free audit, because a café in Surat and a developer in New Jersey don't need the same thing. Ask us."
+  },
+  {
+    "id": "why-three",
+    "q": "Why only three?",
+    "a": "Because we want every founding client to become a case study we're proud of, and that takes real attention. Three is what we can do properly."
+  },
+  {
+    "id": "the-catch",
+    "q": "What's the catch?",
+    "a": "Two things. We publish what we did for you as a case study, with real numbers you approve. And you tell us honestly what worked and what didn't."
+  },
+  {
+    "id": "guarantee",
+    "q": "Do you guarantee results?",
+    "a": "No. Anyone who guarantees you'll go viral is selling you something. We promise clear goals, honest reporting and ideas worth testing. Then we measure."
+  },
+  {
+    "id": "ad-budget",
+    "q": "Is ad spend included?",
+    "a": "No. Ad budgets, production and third-party costs are separate from our fee and always shown upfront, before you spend a rupee or a dollar."
+  },
+  {
+    "id": "new",
+    "q": "You're new. Why should I trust you?",
+    "a": "Fair question. You shouldn't, yet. Take the free audit, read the ideas in The Lab, and judge us on how we think. That's the only portfolio we'll show until we have a real one."
+  },
+  {
+    "id": "term",
+    "q": "How long is the commitment?",
+    "a": "Three months to start. That's how long good marketing needs to show what it can do. After that it's month to month with 30 days' notice. If we're not earning our fee, you shouldn't have to stay."
+  }
+]

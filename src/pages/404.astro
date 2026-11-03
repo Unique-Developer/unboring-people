@@ -1,0 +1,73 @@
+---
+import Base from '../layouts/Base.astro';
+import { primaryCta } from '../site.config';
+---
+
+<Base title="Page not found" description="This page was so boring it left." index={false}>
+  <section class="gone">
+    <div class="wrap inner">
+      <p class="label">[404] Page not found</p>
+      <h1 class="display display-xl" data-boring="Oops! Page Not Found.">This page was so boring it left.</h1>
+
+      <div class="outline" aria-hidden="true">
+        <span class="ghost g1"></span>
+        <span class="ghost g2"></span>
+        <span class="ghost g3"></span>
+        <span class="ghost g4"></span>
+      </div>
+
+      <figure class="note">
+        <blockquote>
+          <p>Gone somewhere more interesting. Don't wait up.</p>
+        </blockquote>
+        <figcaption class="label">The page, probably</figcaption>
+      </figure>
+
+      <div class="ctas">
+        <a class="btn" href={primaryCta.href} data-cursor={primaryCta.verb}>{primaryCta.label} <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="btn btn--paper" href="/">Back to the homepage</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .gone { border-bottom: var(--rule); }
+  .inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+    padding-block: clamp(2.5rem, 7vw, 6rem) var(--section);
+  }
+  h1 { max-width: 12ch; }
+
+  /* Where the page used to be: dashed outlines of the content that walked off. */
+  .outline {
+    display: grid;
+    gap: 1rem;
+    padding: 1.5rem;
+    border: 3px dashed var(--ink);
+    max-width: 44rem;
+    opacity: 0.5;
+  }
+  .ghost { display: block; height: 1.25rem; border: 2px dashed var(--ink); }
+  .g1 { width: 70%; height: 2.5rem; }
+  .g2 { width: 95%; }
+  .g3 { width: 85%; }
+  .g4 { width: 40%; height: 3rem; }
+
+  .note {
+    justify-self: start;
+    margin: -4rem 0 0 clamp(1rem, 10vw, 12rem);
+    padding: 1.25rem 1.5rem;
+    max-width: 22rem;
+    background: var(--lime);
+    border: var(--rule);
+    box-shadow: var(--shadow);
+    transform: rotate(-4deg);
+  }
+  .note blockquote p { font-family: var(--font-display); text-transform: uppercase; font-size: 1.4rem; line-height: 1; }
+  .note figcaption { margin-top: 0.75rem; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 1rem; }
+</style>

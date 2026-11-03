@@ -1,0 +1,56 @@
+[
+  {
+    "id": "q1",
+    "question": "Your Instagram bio currently says…",
+    "answers": [
+      { "text": "\"Best quality. Best service.\"", "score": 2 },
+      { "text": "What we sell and where", "score": 1 },
+      { "text": "A line people remember", "score": 0 }
+    ]
+  },
+  {
+    "id": "q2",
+    "question": "Cover your logo on your last 5 posts. Would people still know they're yours?",
+    "answers": [
+      { "text": "No", "score": 2 },
+      { "text": "Maybe one or two", "score": 1 },
+      { "text": "Instantly", "score": 0 }
+    ]
+  },
+  {
+    "id": "q3",
+    "question": "Put your ads next to your 3 biggest competitors'. They look…",
+    "answers": [
+      { "text": "The same", "score": 2 },
+      { "text": "A bit different", "score": 1 },
+      { "text": "Nothing like theirs", "score": 0 }
+    ]
+  },
+  {
+    "id": "q4",
+    "question": "When did a customer last talk about your marketing, not your product?",
+    "answers": [
+      { "text": "Never", "score": 2 },
+      { "text": "Once or twice", "score": 1 },
+      { "text": "Often", "score": 0 }
+    ]
+  },
+  {
+    "id": "q5",
+    "question": "Your go-to marketing move is…",
+    "answers": [
+      { "text": "Discounts and festival greeting posts", "score": 2 },
+      { "text": "Posting regularly and hoping", "score": 1 },
+      { "text": "Campaigns built around one strong idea", "score": 0 }
+    ]
+  },
+  {
+    "id": "q6",
+    "question": "Your Google reviews are…",
+    "answers": [
+      { "text": "Few, old or unanswered", "score": 2 },
+      { "text": "Decent but rarely replied to", "score": 1 },
+      { "text": "Steady, and we reply to all", "score": 0 }
+    ]
+  }
+]

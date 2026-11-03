@@ -1,0 +1,75 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import { whatsappLink } from '../site.config';
+
+interface Props {
+  idea: CollectionEntry<'lab'>;
+  /** Extra attributes for the filter and shuffle on /lab. */
+  index?: number;
+}
+const { idea, index } = Astro.props;
+const { Content } = await render(idea);
+const { hook, industry, objective, budget } = idea.data;
+const steal = whatsappLink(`Hi UNBORING PEOPLE! I want to steal this idea from The Lab: "${hook}" Can we talk about it for my business?`);
+---
+
+<article class="card" id={idea.id} data-industry={industry} data-index={index} data-hook={hook} aria-labelledby={`idea-${idea.id}`}>
+  <p class="stamp label">Idea, not past work</p>
+  <p class="meta label">
+    <span>{industry}</span>
+    <span>Goal: {objective}</span>
+  </p>
+  <h3 id={`idea-${idea.id}`} class="display display-s hook">{hook}</h3>
+  <div class="body"><Content /></div>
+  <div class="foot">
+    <p class="budget label"><span class="muted">Rough budget</span><br />{budget}</p>
+    <a class="btn steal" href={steal} data-track="whatsapp_click" data-source="lab-card" data-cursor="steal">
+      Steal this idea<span class="sr-only">: {hook}</span> <span class="arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+</article>
+
+<style>
+  .card {
+    position: relative;
+    scroll-margin-top: 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--paper);
+    color: var(--ink);
+    border: var(--rule);
+    box-shadow: var(--shadow);
+    height: 100%;
+  }
+  .stamp {
+    align-self: flex-start;
+    padding: 0.25rem 0.5rem;
+    border: 2px solid var(--ink);
+    transform: rotate(-3deg);
+    font-size: 0.72rem;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 0.6rem;
+  }
+  .hook { font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); }
+  .body :global(p) { font-size: 1rem; }
+  .foot {
+    margin-top: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 0.5rem;
+  }
+  .budget { line-height: 1.4; }
+  .steal { min-height: 2.75rem; padding: 0.6rem 1rem; font-size: 0.9rem; box-shadow: 4px 4px 0 var(--ink); }
+  .steal:hover { box-shadow: 2px 2px 0 var(--ink); transform: translate(2px, 2px); }
+</style>

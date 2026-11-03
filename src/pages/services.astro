@@ -1,0 +1,174 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { primaryCta, whatsappLink, defaultWhatsappMessage } from '../site.config';
+
+const services = (await getCollection('services')).sort((a, b) => a.data.number.localeCompare(b.data.number));
+
+// How clients can buy. Kept here, not in content, because it's structure rather than copy that changes often.
+const models = [
+  { name: 'Monthly retainers', note: 'Ongoing content, ads and presence. The usual way in.' },
+  { name: 'Brand strategy projects', note: 'One-time: positioning, voice and visual direction.' },
+  { name: 'Campaign projects', note: 'One big idea, planned, made and measured.' },
+  { name: 'Ad management', note: 'Meta and Google, run properly and reported plainly.' },
+  { name: 'Content packages', note: 'Reels, posts and carousels in a fixed monthly batch.' },
+  { name: 'Website and presence projects', note: 'Fix the site, the Google profile and the reviews.' },
+];
+---
+
+<Base
+  title="Services: branding, campaigns, content, ads and local SEO"
+  description="Five ways UNBORING PEOPLE makes boring brands unforgettable: brand identity, campaign ideas, Instagram content, Meta and Google ads, and Google Business Profile and local SEO. Creative marketing agency in Surat."
+>
+  <PageHeader eyebrow="[01] Services" title="Five ways to stop being ignored." boring="Our Services">
+    <p>No 360° anything. Five things we do properly, in plain words: what you get, who it's for, and one idea to show how we think.</p>
+  </PageHeader>
+
+  <nav class="index wrap" aria-label="Services on this page">
+    <ol role="list">
+      {services.map((s) => <li><a href={`#${s.id}`}><span class="label">{s.data.number}</span> {s.data.name.replace('Unboring ', '')}</a></li>)}
+    </ol>
+  </nav>
+
+  {services.map((s, i) => (
+    <section id={s.id} class:list={['svc', { 'on-ink': i % 2 === 1 }]} aria-labelledby={`${s.id}-title`}>
+      <div class="wrap svc-inner">
+        <p class="num display" aria-hidden="true">{s.data.number}</p>
+        <div class="main">
+          <h2 id={`${s.id}-title`} class="display display-l">{s.data.name}</h2>
+          <p class="one">{s.data.oneLiner}</p>
+
+          <div class="cols">
+            <div>
+              <h3 class="label h">What you get</h3>
+              <p>{s.data.youGet}</p>
+            </div>
+            <div>
+              <h3 class="label h">Who it's for</h3>
+              <p>{s.data.forWho}</p>
+            </div>
+            <div>
+              <h3 class="label h">Includes</h3>
+              <ul role="list" class="inc">{s.data.includes.map((x) => <li>{x}</li>)}</ul>
+            </div>
+          </div>
+
+          <aside class="idea" aria-label="Example idea">
+            <p class="label tag">Example idea, not past work</p>
+            <p>{s.data.exampleIdea}</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <section class="models" aria-labelledby="models-title">
+    <div class="wrap models-inner">
+      <div class="models-head">
+        <p class="label">[06] How you can work with us</p>
+        <h2 id="models-title" class="display display-l">Pick a shape. We'll size it.</h2>
+        <p class="lede">Every package has a fixed list of deliverables, written down before we start. Pricing? Founder pricing for our first three clients. Ask us.</p>
+      </div>
+      <ul role="list" class="model-list">
+        {models.map((m) => <li><strong class="label">{m.name}</strong><span>{m.note}</span></li>)}
+      </ul>
+      <p class="costs">
+        <span class="mark">Ad budgets, production and third-party costs are separate from our fee, and always shown upfront.</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="end on-lime" aria-labelledby="end-title">
+    <div class="wrap end-inner">
+      <h2 id="end-title" class="display display-l">Not sure which one you need?</h2>
+      <p class="lede">That's what the free audit is for. One page, one honest look at your marketing, one idea for what to do next.</p>
+      <div class="ctas">
+        <a class="btn btn--ink" href={whatsappLink(defaultWhatsappMessage)} data-track="whatsapp_click" data-source="services" data-cursor="talk">Get your free Unboring Audit</a>
+        <a class="btn btn--paper" href={primaryCta.href} data-cursor={primaryCta.verb}>{primaryCta.label}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .index { padding-block: 1.25rem; border-bottom: var(--rule); }
+  .index ol { display: flex; flex-wrap: wrap; gap: 0.5rem 1.75rem; padding: 0; list-style: none; }
+  .index a {
+    font-family: var(--font-label);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    border-bottom: 3px solid transparent;
+  }
+  .index a:hover { border-color: var(--lime); }
+  .index .label { opacity: 0.6; }
+
+  .svc { border-bottom: var(--rule); scroll-margin-top: 4.5rem; }
+  .svc-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    padding-block: var(--section);
+  }
+  .num {
+    font-size: clamp(4rem, 2rem + 12vw, 14rem);
+    line-height: 0.75;
+    color: transparent;
+    -webkit-text-stroke: 3px currentColor;
+  }
+  .on-ink .num { -webkit-text-stroke-color: var(--lime); }
+  .main { display: grid; gap: 1.75rem; }
+  .one { font-size: var(--step-2); font-weight: 500; line-height: 1.2; max-width: 26ch; }
+  .cols { display: grid; gap: 1.75rem; }
+  .h { margin-bottom: 0.6rem; }
+  .on-ink .h { color: var(--lime); }
+  .inc { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0; list-style: none; }
+  .inc li {
+    padding: 0.3rem 0.6rem;
+    border: 2px solid currentColor;
+    font-family: var(--font-label);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .idea {
+    display: grid;
+    gap: 0.6rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--lime);
+    color: var(--ink);
+    border: var(--rule);
+    box-shadow: var(--shadow);
+    max-width: 44rem;
+    transform: rotate(-0.6deg);
+  }
+  .on-ink .idea { box-shadow: 6px 6px 0 var(--paper); border-color: var(--ink); }
+  .idea p:last-child { font-size: var(--step-1); font-weight: 500; line-height: 1.35; }
+
+  .models { border-bottom: var(--rule); }
+  .models-inner { display: grid; gap: 2.5rem; padding-block: var(--section); }
+  .models-head { display: grid; gap: 1.25rem; }
+  .models-head h2 { max-width: 14ch; }
+  .model-list { display: grid; padding: 0; list-style: none; border-top: var(--rule); }
+  .model-list li {
+    display: grid;
+    gap: 0.25rem;
+    padding-block: 1rem;
+    border-bottom: var(--rule);
+  }
+  .model-list strong { font-size: 1rem; }
+  .costs { font-size: var(--step-1); font-weight: 500; line-height: 1.5; }
+
+  .end-inner { display: grid; gap: 1.5rem; padding-block: var(--section); }
+  .end-inner h2 { max-width: 14ch; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 1rem; }
+
+  @media (min-width: 900px) {
+    .svc-inner { grid-template-columns: minmax(0, 0.8fr) minmax(0, 2.2fr); gap: 3rem; }
+    .cols { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .model-list li { grid-template-columns: 1fr 1.5fr; align-items: baseline; }
+    .models-inner { grid-template-columns: 1fr 1.2fr; }
+    .costs { grid-column: 1 / -1; }
+  }
+</style>

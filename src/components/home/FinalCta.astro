@@ -1,0 +1,40 @@
+---
+import { site, primaryCta, whatsappLink, defaultWhatsappMessage, mailtoLink, emailLine } from '../../site.config';
+
+const email = mailtoLink('Bored of my marketing');
+---
+
+<section class="final" aria-labelledby="final-title">
+  <div class="wrap inner">
+    <h2 id="final-title" class="display display-xl" data-boring="Contact Us Today!">Don't just exist. <span class="mark">Make an impact.</span></h2>
+    <div class="row">
+      <p class="lede">Start with the test, or skip it and tell us what's boring. Either way, the first audit is free.</p>
+      <div class="ctas">
+        <a class="btn" href={primaryCta.href} data-cursor={primaryCta.verb}>{primaryCta.label} <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="btn btn--ink" href={whatsappLink(defaultWhatsappMessage)} data-track="whatsapp_click" data-source="home-final" data-cursor="talk">Talk to us on WhatsApp</a>
+      </div>
+    </div>
+    {email && (
+      <p class="email">
+        {emailLine} Email <a href={email} data-track="email_click" data-source="home-final" data-cursor="email">{site.contact.email}</a>
+      </p>
+    )}
+  </div>
+</section>
+
+<style>
+  .inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
+    padding-block: var(--section);
+  }
+  h2 { max-width: 12ch; }
+  .row { display: grid; gap: 1.75rem; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 1.25rem; }
+  .email { font-family: var(--font-label); font-weight: 500; font-size: var(--step-1); }
+  .email a { font-weight: 700; text-decoration-color: var(--lime); text-decoration-thickness: 4px; overflow-wrap: anywhere; }
+  @media (min-width: 1000px) {
+    .row { grid-template-columns: 1fr auto; align-items: end; }
+  }
+</style>

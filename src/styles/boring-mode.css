@@ -1,0 +1,77 @@
+/*
+  Boring mode: what this site would look like if we were a normal agency.
+  Everything here is scoped to html.boring-mode. The banner itself keeps the real brand so there's a way out.
+*/
+html.boring-mode {
+  --ink: #222831;
+  --paper: #ffffff;
+  --lime: #2f6fde;
+  --concrete: #8a94a6;
+  --concrete-light: #5b6475;
+  --ink-soft: #5b6475;
+  --font-display: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-label: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-body: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --rule: 1px solid #e3e7ef;
+  --shadow: 0 8px 24px rgba(34, 40, 49, 0.08);
+}
+
+.boring-mode body { background: #ffffff; }
+.boring-mode .on-ink,
+.boring-mode .on-lime { background: #f4f6fb; color: #222831; }
+
+.boring-mode .display {
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.boring-mode .display-xl,
+.boring-mode .display-l { font-size: clamp(1.9rem, 1.2rem + 2.6vw, 3rem); }
+.boring-mode .display-m { font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem); }
+.boring-mode .label { letter-spacing: normal; text-transform: none; font-weight: 600; }
+
+/* Centre everything. Obviously. */
+.boring-mode main .wrap { text-align: center; }
+.boring-mode main h1,
+.boring-mode main h2,
+.boring-mode main p { margin-inline: auto; }
+.boring-mode main h1,
+.boring-mode main h2 { max-width: 24ch; }
+.boring-mode main .ctas { justify-content: center; }
+
+.boring-mode .mark { background: none; color: #2f6fde; }
+.boring-mode .lime { color: #2f6fde !important; }
+
+.boring-mode .btn {
+  border: 0;
+  border-radius: 999px;
+  background: #2f6fde;
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(47, 111, 222, 0.3);
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 600;
+}
+.boring-mode .btn--ink { background: #ffffff; color: #2f6fde; border: 2px solid #2f6fde; box-shadow: none; }
+.boring-mode .btn:hover { transform: none; box-shadow: 0 8px 20px rgba(47, 111, 222, 0.4); }
+
+/* Round every corner the real site refuses to round. */
+.boring-mode main [class*='card'],
+.boring-mode main .q,
+.boring-mode main .opt,
+.boring-mode main .seats-note,
+.boring-mode .menu-toggle { border-radius: 14px; border-width: 1px; }
+
+/* The clichés stop being crossed out. In boring mode we mean them. */
+.boring-mode .never .txt { color: #222831 !important; }
+.boring-mode .never .txt::after { transform: scaleX(0) !important; }
+
+.boring-mode .sticker { filter: grayscale(1); }
+.boring-mode .wordmark { font-weight: 300; color: #dfe4ee; }
+
+/* The footer goes light in boring mode, so its paper-coloured links need a colour that shows. */
+.boring-mode .site-footer a,
+.boring-mode [data-boring-toggle] { color: #2f6fde; }
+.boring-mode .site-footer .wordmark-wrap,
+.boring-mode .site-footer .cols { border-color: #e3e7ef; }

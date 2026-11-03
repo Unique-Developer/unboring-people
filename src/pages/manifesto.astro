@@ -1,0 +1,152 @@
+---
+import Base from '../layouts/Base.astro';
+import Clocks from '../components/Clocks.astro';
+import Bridge from '../components/Bridge.astro';
+import { site, primaryCta, whatsappLink, defaultWhatsappMessage } from '../site.config';
+
+const beliefs = [
+  { t: 'Attention is just the beginning.', d: 'Getting noticed is easy. Getting remembered, trusted and paid is the job. We plan for all four.' },
+  { t: 'Boring is expensive.', d: "If people can't tell your ads from your competitor's, you're paying to advertise the whole category." },
+  { t: 'One idea beats fifty posts.', d: 'A single thing people repeat to their friends does more than a calendar full of filler.' },
+  { t: 'Creative has to earn its keep.', d: 'Every crazy idea gets a business goal and a number we judge it by. Funny is nice. Profitable is the point.' },
+  { t: 'Good products deserve better marketing.', d: "Most businesses we want to work with aren't boring. Their marketing is. That's fixable." },
+];
+const refuse = [
+  'Fake reviews, fake followers, fake numbers',
+  'Promising you\'ll go viral',
+  'Hiding ad spend inside our fee',
+  'Stock photos of people pointing at laptops',
+  'Copying your competitor and calling it strategy',
+  'Jargon you need a dictionary for',
+  'Festival greeting posts with nothing to say',
+];
+const { home, away } = site.places;
+---
+
+<Base
+  title="Manifesto: why UNBORING PEOPLE exists"
+  description="Great brands don't need to shout louder. They need to give people something worth talking about. What UNBORING PEOPLE believes, and what we refuse to do."
+>
+  <header class="poster on-ink">
+    <div class="wrap poster-inner">
+      <p class="label lime">[04] Manifesto</p>
+      <h1 class="display belief" data-boring="About Us">
+        Great brands don't need to <span class="strike">shout louder.</span>
+        They need to give people <span class="mark">something worth talking&nbsp;about.</span>
+      </h1>
+      <p class="sign label">UNBORING PEOPLE / {site.tagline}</p>
+    </div>
+  </header>
+
+  <section class="beliefs" aria-labelledby="beliefs-title">
+    <div class="wrap b-inner">
+      <h2 id="beliefs-title" class="display display-l">What we believe</h2>
+      <ol role="list">
+        {beliefs.map((b, i) => (
+          <li>
+            <span class="n label" aria-hidden="true">0{i + 1}</span>
+            <h3 class="display display-s">{b.t}</h3>
+            <p>{b.d}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="refuse on-lime" aria-labelledby="refuse-title">
+    <div class="wrap r-inner">
+      <h2 id="refuse-title" class="display display-l">What we refuse to do</h2>
+      <ul role="list">
+        {refuse.map((r) => <li><s>{r}</s></li>)}
+      </ul>
+      <p class="lede">Ordinary is not our thing. Neither is lying about it.</p>
+    </div>
+  </section>
+
+  <section class="bridge-sec on-ink" aria-labelledby="bridge-title">
+    <div class="wrap br-inner">
+      <h2 id="bridge-title" class="display display-l">
+        {home.city} <Bridge class="big-arrow" /> <span class="sr-only">and</span> {away.city}
+      </h2>
+      <p class="lede">
+        Head office in {home.city}, India. A teammate on {away.city} time. Not a head office and a branch: a two-way
+        bridge. Two clocks means someone is usually awake thinking about your brand.
+      </p>
+    </div>
+  </section>
+
+  <Clocks label="Right now" />
+
+  <section class="end" aria-labelledby="end-title">
+    <div class="wrap end-inner">
+      <h2 id="end-title" class="display display-l">Different thinking. <span class="mark">Real growth.</span></h2>
+      <div class="ctas">
+        <a class="btn" href={primaryCta.href} data-cursor={primaryCta.verb}>{primaryCta.label} <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="btn btn--ink" href={whatsappLink(defaultWhatsappMessage)} data-track="whatsapp_click" data-source="manifesto" data-cursor="talk">Talk to us on WhatsApp</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .lime { color: var(--lime); }
+  .poster { border-bottom: var(--rule); }
+  .poster-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
+    padding-block: clamp(3rem, 8vw, 7rem);
+  }
+  .belief { font-size: clamp(2.4rem, 0.8rem + 7vw, 8rem); line-height: 0.9; max-width: 15ch; }
+  .strike { position: relative; color: var(--concrete); }
+  .strike::after {
+    content: '';
+    position: absolute;
+    left: -0.04em;
+    right: -0.04em;
+    top: 46%;
+    height: 0.13em;
+    background: var(--lime);
+    transform: rotate(-2deg);
+  }
+  .sign { color: var(--concrete-light); }
+
+  .beliefs { border-bottom: var(--rule); }
+  .b-inner { display: grid; gap: 3rem; padding-block: var(--section); }
+  .b-inner ol { display: grid; padding: 0; list-style: none; border-top: var(--rule); }
+  .b-inner li {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    gap: 0.5rem 1rem;
+    padding-block: 1.75rem;
+    border-bottom: var(--rule);
+  }
+  .b-inner li > :not(.n) { grid-column: 2; }
+  .b-inner .n { padding-top: 0.4rem; }
+  .b-inner p { font-size: var(--step-1); line-height: 1.4; }
+
+  .refuse { border-bottom: var(--rule); }
+  .r-inner { display: grid; gap: 2.5rem; padding-block: var(--section); }
+  .r-inner ul { display: grid; gap: 0.5rem; padding: 0; list-style: none; }
+  .r-inner li {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: clamp(1.4rem, 0.9rem + 2.4vw, 3rem);
+    line-height: 1.05;
+  }
+  .r-inner s { text-decoration-thickness: 0.12em; text-decoration-color: var(--ink); }
+
+  .bridge-sec { border-bottom: var(--rule); }
+  .br-inner { display: grid; gap: 2rem; padding-block: var(--section); }
+  .br-inner h2 { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3em; max-width: none; }
+  .br-inner :global(.big-arrow) { width: 1.6em; height: 0.8em; color: var(--lime); }
+
+  .end-inner { display: grid; gap: 2rem; padding-block: var(--section); }
+  .ctas { display: flex; flex-wrap: wrap; gap: 1rem; }
+
+  @media (min-width: 900px) {
+    .b-inner { grid-template-columns: 1fr 2fr; align-items: start; }
+    .b-inner li { grid-template-columns: 4rem 1fr 1.2fr; align-items: baseline; }
+    .b-inner li > :not(.n) { grid-column: auto; }
+  }
+</style>

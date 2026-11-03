@@ -1,0 +1,172 @@
+@import './tokens.css';
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+* { margin: 0; }
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: 5rem;
+}
+body {
+  min-height: 100svh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+  display: flex;
+  flex-direction: column;
+}
+main { flex: 1; }
+main:focus { outline: none; box-shadow: none; } /* skip-link target: focus moves here, no frame needed */
+img, svg, video, canvas { display: block; max-width: 100%; }
+input, button, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: inherit; text-underline-offset: 0.18em; text-decoration-thickness: 2px; }
+h1, h2, h3, h4 { text-wrap: balance; }
+p { text-wrap: pretty; max-width: 62ch; }
+::selection { background: var(--lime); color: var(--ink); }
+
+/* ---------- Focus: always visible, always on-brand ---------- */
+:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px var(--lime);
+}
+.on-ink :focus-visible {
+  outline-color: var(--lime);
+  box-shadow: 0 0 0 6px var(--ink);
+}
+
+/* ---------- Grounds ---------- */
+.on-ink { background: var(--ink); color: var(--paper); }
+.on-lime { background: var(--lime); color: var(--ink); }
+.on-paper { background: var(--paper); color: var(--ink); }
+
+/* ---------- Layout ---------- */
+.wrap {
+  width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.section { padding-block: var(--section); }
+
+/* ---------- Type ---------- */
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 0.86;
+  letter-spacing: -0.035em;
+  overflow-wrap: break-word; /* last-resort safety net; size headings so it never triggers */
+}
+.display-xl { font-size: var(--step-5); }
+.display-l { font-size: var(--step-4); }
+.display-m { font-size: var(--step-3); }
+.display-s { font-size: var(--step-2); line-height: 0.95; letter-spacing: -0.02em; }
+
+.label {
+  font-family: var(--font-label);
+  font-size: var(--step--1);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.lede { font-size: var(--step-1); line-height: 1.4; font-weight: 500; }
+.muted { color: var(--ink-soft); }
+.on-ink .muted { color: var(--concrete-light); }
+
+/* Lime highlight behind text: safe on any ground because the text stays ink. */
+.mark {
+  background: var(--lime);
+  color: var(--ink);
+  padding: 0 0.12em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+/* In tight display type the highlight overlaps the line above, so trim it and tuck it behind neighbouring lines. */
+.display { isolation: isolate; }
+.display .mark {
+  position: relative;
+  z-index: -1;
+  background: linear-gradient(transparent 10%, var(--lime) 10%, var(--lime) 88%, transparent 88%);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  --btn-bg: var(--lime);
+  --btn-fg: var(--ink);
+  --btn-shadow: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  min-height: 3.25rem;
+  padding: 0.85rem 1.4rem;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  border: var(--rule);
+  box-shadow: 6px 6px 0 var(--btn-shadow);
+  font-family: var(--font-label);
+  font-size: var(--step-0);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  line-height: 1.1;
+  transition: transform var(--fast) var(--ease-snap), box-shadow var(--fast) var(--ease-snap);
+}
+.btn:hover { transform: translate(3px, 3px); box-shadow: 3px 3px 0 var(--btn-shadow); }
+.btn:active { transform: var(--press); box-shadow: 0 0 0 var(--btn-shadow); }
+.btn--ink { --btn-bg: var(--ink); --btn-fg: var(--paper); --btn-shadow: var(--lime); }
+.btn--paper { --btn-bg: var(--paper); --btn-fg: var(--ink); }
+.on-ink .btn { border-color: var(--paper); --btn-shadow: var(--paper); }
+.on-ink .btn--ink { --btn-shadow: var(--lime); }
+.btn .arrow { font-family: var(--font-display); transition: transform var(--fast) var(--ease-snap); }
+.btn:hover .arrow { transform: translateX(4px); }
+
+/* ---------- Accessibility helpers ---------- */
+.sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0);
+  white-space: nowrap; border: 0;
+}
+.skip-link {
+  position: absolute;
+  left: 1rem; top: -100px;
+  z-index: 1000;
+  padding: 0.75rem 1rem;
+  background: var(--lime);
+  color: var(--ink);
+  border: var(--rule);
+  font-family: var(--font-label);
+  font-weight: 700;
+  text-decoration: none;
+}
+.skip-link:focus { top: 1rem; }
+
+/* ---------- Placeholders: impossible to miss, so none ship by accident ---------- */
+.placeholder {
+  background: repeating-linear-gradient(-45deg, var(--lime) 0 6px, var(--paper) 6px 12px);
+  color: var(--ink);
+  outline: 2px dashed var(--ink);
+  padding: 0 0.25em;
+  font-family: var(--font-label);
+  font-weight: 700;
+}
+
+/* Reduced motion: each animated component ships its own calm alternative.
+   This only stops smooth scrolling and the button nudges. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .btn, .btn .arrow { transition: none; }
+  .btn:hover, .btn:hover .arrow { transform: none; }
+}

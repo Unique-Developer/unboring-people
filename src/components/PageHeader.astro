@@ -1,0 +1,33 @@
+---
+/** The opening block of every inner page: section label, one huge h1, a short lede. */
+interface Props {
+  eyebrow: string;
+  title: string;
+  /** Optional replacement headline for boring mode. */
+  boring?: string;
+  ground?: 'paper' | 'ink' | 'lime';
+}
+const { eyebrow, title, boring, ground = 'paper' } = Astro.props;
+---
+
+<header class:list={['ph', `on-${ground}`]}>
+  <div class="wrap inner">
+    <p class="label eyebrow">{eyebrow}</p>
+    <h1 class="display display-xl" data-boring={boring} data-knock>{title}</h1>
+    <div class="lede-slot"><slot /></div>
+  </div>
+</header>
+
+<style>
+  .ph { border-bottom: var(--rule); }
+  .inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.75rem;
+    padding-block: clamp(2.5rem, 7vw, 6rem) clamp(2.5rem, 5vw, 4.5rem);
+  }
+  h1 { max-width: 12ch; }
+  .on-ink .eyebrow { color: var(--lime); }
+  .lede-slot { display: grid; gap: 1.5rem; justify-items: start; }
+  .lede-slot :global(p) { font-size: var(--step-1); line-height: 1.4; font-weight: 500; max-width: 44ch; }
+</style>

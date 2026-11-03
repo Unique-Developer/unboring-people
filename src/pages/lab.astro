@@ -1,0 +1,233 @@
+---
+import { getCollection } from 'astro:content';
+import { industries } from '../content.config';
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import LabCard from '../components/LabCard.astro';
+import { primaryCta, whatsappLink, defaultWhatsappMessage } from '../site.config';
+
+const ideas = (await getCollection('lab')).sort((a, b) => a.data.order - b.data.order);
+const counts = Object.fromEntries(industries.map((i) => [i, ideas.filter((x) => x.data.industry === i).length]));
+const filters = industries.filter((i) => counts[i] > 0);
+---
+
+<Base
+  title="The Unboring Lab: campaign ideas you can steal"
+  description="A vault of crazy-but-doable marketing ideas for cafés, real estate, jewellery, wellness, D2C, hospitality and interior brands. Ideas, not past work. Steal one."
+>
+  <PageHeader eyebrow="[02] The Unboring Lab" title="Ideas you can steal." boring="Our Portfolio">
+    <p>
+      Crazy-but-doable campaign ideas, built for real budgets. Every one is an idea, not past work. Find one for your
+      industry, or let the machine pick.
+    </p>
+    <p class="label small">Budgets are rough campaign costs. They don't include our fee.</p>
+  </PageHeader>
+
+  <section class="machine on-ink" aria-labelledby="machine-title" data-shuffle>
+    <div class="wrap inner">
+      <div class="lever">
+        <h2 id="machine-title" class="display display-m">Can't decide?</h2>
+        <button type="button" class="btn" data-shuffle-go data-cursor="spin">Shuffle me an idea <span class="arrow" aria-hidden="true">↻</span></button>
+      </div>
+      <div class="window" aria-live="polite" aria-atomic="true">
+        <p class="label slot-meta" data-slot-meta>{ideas.length} ideas in the vault</p>
+        <p class="display slot-hook" data-slot-hook>Pull the lever.</p>
+        <p class="slot-actions" data-slot-actions hidden>
+          <a class="btn btn--paper" href="#" data-slot-read>Read it</a>
+          <a class="btn" href="#" data-slot-steal data-track="whatsapp_click" data-source="lab-shuffle" data-cursor="steal">Steal it <span class="arrow" aria-hidden="true">→</span></a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="vault" aria-labelledby="vault-title">
+    <div class="wrap">
+      <div class="vault-head">
+        <h2 id="vault-title" class="label">The vault</h2>
+        <div class="filters" role="group" aria-label="Filter by industry">
+          <button type="button" class="chip" aria-pressed="true" data-filter="all">All <span>{ideas.length}</span></button>
+          {filters.map((f) => (
+            <button type="button" class="chip" aria-pressed="false" data-filter={f}>{f} <span>{counts[f]}</span></button>
+          ))}
+        </div>
+        <p class="sr-only" aria-live="polite" data-filter-status></p>
+      </div>
+
+      <ul class="grid" role="list" data-grid>
+        {ideas.map((idea, i) => <li data-industry={idea.data.industry}><LabCard idea={idea} index={i} /></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="more on-lime" aria-labelledby="more-title">
+    <div class="wrap inner-more">
+      <h2 id="more-title" class="display display-l">No idea fits? Good. Yours should be yours.</h2>
+      <p class="lede">These are starting points. The real one gets built around your business, your street and your budget.</p>
+      <div class="ctas">
+        <a class="btn btn--ink" href={whatsappLink(defaultWhatsappMessage)} data-track="whatsapp_click" data-source="lab-bottom" data-cursor="talk">Get your free Unboring Audit</a>
+        <a class="btn btn--paper" href={primaryCta.href} data-cursor={primaryCta.verb}>{primaryCta.label}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { track } from '../scripts/track';
+
+  const grid = document.querySelector<HTMLElement>('[data-grid]')!;
+  const items = Array.from(grid.querySelectorAll<HTMLLIElement>('li'));
+  const chips = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-filter]'));
+  const status = document.querySelector<HTMLElement>('[data-filter-status]')!;
+  let active = 'all';
+
+  const visible = () => items.filter((li) => !li.hidden);
+
+  chips.forEach((chip) =>
+    chip.addEventListener('click', () => {
+      active = chip.dataset.filter!;
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+      items.forEach((li) => (li.hidden = active !== 'all' && li.dataset.industry !== active));
+      const n = visible().length;
+      status.textContent = `Showing ${n} ${n === 1 ? 'idea' : 'ideas'}${active === 'all' ? '' : ` for ${active}`}.`;
+    }),
+  );
+
+  // The slot machine
+  const go = document.querySelector<HTMLButtonElement>('[data-shuffle-go]')!;
+  const hookEl = document.querySelector<HTMLElement>('[data-slot-hook]')!;
+  const metaEl = document.querySelector<HTMLElement>('[data-slot-meta]')!;
+  const actions = document.querySelector<HTMLElement>('[data-slot-actions]')!;
+  const read = document.querySelector<HTMLAnchorElement>('[data-slot-read]')!;
+  const steal = document.querySelector<HTMLAnchorElement>('[data-slot-steal]')!;
+  const windowEl = hookEl.parentElement!;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  let last = -1;
+  let spinning = false;
+
+  const cardOf = (li: HTMLLIElement) => li.querySelector<HTMLElement>('article')!;
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  const land = (li: HTMLLIElement) => {
+    const card = cardOf(li);
+    hookEl.textContent = card.dataset.hook!;
+    metaEl.textContent = `${card.dataset.industry} / Idea, not past work`;
+    read.href = `#${card.id}`;
+    steal.href = card.querySelector<HTMLAnchorElement>('a[data-source="lab-card"]')!.href;
+    actions.hidden = false;
+    windowEl.classList.remove('landed');
+    void windowEl.offsetWidth;
+    windowEl.classList.add('landed');
+  };
+
+  go.addEventListener('click', async () => {
+    if (spinning) return;
+    const pool = visible();
+    if (!pool.length) return;
+    let pick = Math.floor(Math.random() * pool.length);
+    if (pool.length > 1 && pool[pick] === items[last]) pick = (pick + 1) % pool.length;
+    const target = pool[pick];
+    last = items.indexOf(target);
+
+    spinning = true;
+    go.disabled = true;
+    windowEl.setAttribute('aria-busy', 'true');
+    actions.hidden = true;
+
+    if (!reduce.matches) {
+      // Fast at first, then slowing down, like a real reel.
+      windowEl.classList.add('spinning');
+      for (let t = 0, delay = 45; delay < 260; t++, delay *= 1.16) {
+        const li = pool[(pick + t + 1) % pool.length];
+        hookEl.textContent = cardOf(li).dataset.hook!;
+        metaEl.textContent = cardOf(li).dataset.industry!;
+        await sleep(delay);
+      }
+      windowEl.classList.remove('spinning');
+    }
+
+    windowEl.removeAttribute('aria-busy');
+    land(target);
+    spinning = false;
+    go.disabled = false;
+    track('lab_idea_shuffled', { idea: cardOf(target).id, filter: active });
+  });
+</script>
+
+<style>
+  .small { opacity: 0.8; }
+
+  .machine { border-bottom: var(--rule); }
+  .inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+    padding-block: clamp(3rem, 6vw, 5rem);
+  }
+  .lever { display: grid; gap: 1.5rem; justify-items: start; align-content: center; }
+  :global(.no-js) .machine { display: none; }
+
+  .window {
+    display: grid;
+    gap: 1rem;
+    align-content: center;
+    min-height: 15rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 3px solid var(--paper);
+    box-shadow: var(--shadow-lime);
+    overflow: hidden;
+  }
+  .slot-meta { color: var(--lime); }
+  .slot-hook { font-size: clamp(1.8rem, 1rem + 3.5vw, 3.6rem); line-height: 0.95; }
+  .slot-actions { display: flex; flex-wrap: wrap; gap: 1rem; }
+  .slot-actions[hidden] { display: none; }
+  .window.spinning .slot-hook { filter: blur(1.5px); opacity: 0.8; }
+  .window.landed .slot-hook { animation: thunk 360ms var(--ease-snap); }
+  @keyframes thunk {
+    0% { transform: translateY(-0.4em); opacity: 0; }
+    70% { transform: translateY(0.06em); opacity: 1; }
+    100% { transform: none; }
+  }
+
+  .vault { padding-block: var(--section); border-bottom: var(--rule); }
+  .vault-head { display: grid; gap: 1.25rem; margin-bottom: 2.5rem; }
+  .filters { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  :global(.no-js) .filters { display: none; }
+  .chip {
+    padding: 0.55rem 0.9rem;
+    background: var(--paper);
+    color: var(--ink);
+    border: var(--rule);
+    font-family: var(--font-label);
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .chip span { opacity: 0.6; margin-left: 0.2rem; }
+  .chip:hover { background: var(--lime); }
+  .chip[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
+
+  .grid { display: grid; gap: 1.75rem; padding: 0; list-style: none; }
+  .grid li[hidden] { display: none; }
+
+  .inner-more {
+    display: grid;
+    gap: 1.5rem;
+    padding-block: var(--section);
+  }
+  .inner-more h2 { max-width: 16ch; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 1rem; }
+
+  @media (min-width: 760px) {
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1000px) {
+    .inner { grid-template-columns: 1fr 1.6fr; gap: 3rem; }
+  }
+  @media (min-width: 1200px) {
+    .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .window.landed .slot-hook { animation: none; }
+  }
+</style>

@@ -1,0 +1,330 @@
+---
+/**
+ * The Boring Site: a deliberately generic agency homepage that covers the real one on the first visit of a
+ * session, then gets crossed out and demolished. The real page is in the HTML underneath the whole time.
+ *
+ * Shown only when the inline script below adds `boring-intro` to <html>, which happens before first paint, so
+ * crawlers, no-JS visitors and ad traffic never see it. Add ?intro=1 to the URL to force it while testing.
+ */
+---
+
+<script is:inline>
+  (function () {
+    try {
+      var q = location.search;
+      var force = /[?&]intro=1\b/.test(q);
+      var seen = sessionStorage.getItem('up-intro-seen');
+      sessionStorage.setItem('up-intro-seen', '1');
+      // Ad traffic never sees it, not even later in the visit: they clicked to see us, not a joke.
+      if (!force && (seen || /[?&](utm_source|fbclid|gclid)=/.test(q))) return;
+      document.documentElement.classList.add('boring-intro');
+    } catch (e) { /* storage blocked: skip the intro rather than show it on every page view */ }
+  })();
+</script>
+
+<div class="bs" data-boring-site>
+  <div class="bs-page" aria-hidden="true" data-bs-page>
+    <header class="bs-nav bs-piece">
+      <span class="bs-logo"><span class="bs-swoosh"></span>Unboring People <small>Digital Solutions</small></span>
+      <span class="bs-links"><span>Home</span><span>About Us</span><span>Services</span><span>Portfolio</span><span>Blog</span></span>
+      <span class="bs-btn">Contact Us</span>
+    </header>
+
+    <section class="bs-hero">
+      <div class="bs-hero-copy bs-piece">
+        <p class="bs-kicker">WELCOME TO OUR AGENCY</p>
+        <p class="bs-h1" data-bs-headline>We Are A Results-Driven Digital Marketing Agency</p>
+        <p class="bs-sub">Delivering 360° solutions to take your business to the next level with cutting-edge strategies.</p>
+        <p class="bs-ctas"><span class="bs-btn">Get Started</span><span class="bs-btn bs-btn--ghost">Learn More</span></p>
+      </div>
+      <div class="bs-stock bs-piece">
+        <svg viewBox="0 0 320 220">
+          <rect x="20" y="30" width="280" height="160" rx="14" fill="#e9eefb" />
+          <rect x="60" y="120" width="30" height="50" rx="4" fill="#9db7ef" />
+          <rect x="110" y="95" width="30" height="75" rx="4" fill="#7a9de9" />
+          <rect x="160" y="75" width="30" height="95" rx="4" fill="#5583e2" />
+          <rect x="210" y="50" width="30" height="120" rx="4" fill="#2f6fde" />
+          <path d="M55 110 L120 85 L170 65 L250 38" stroke="#ff9f43" stroke-width="5" fill="none" stroke-linecap="round" />
+          <circle cx="250" cy="38" r="8" fill="#ff9f43" />
+        </svg>
+      </div>
+      <!-- The lime marker that crosses the headline out. -->
+      <svg class="bs-marker" viewBox="0 0 600 200" preserveAspectRatio="none">
+        <path d="M10 60 C 150 40, 300 90, 590 50" />
+        <path d="M14 140 C 200 110, 380 170, 586 120" />
+        <path d="M30 20 L 570 180" />
+      </svg>
+    </section>
+
+    <section class="bs-services">
+      <div class="bs-card bs-piece"><span class="bs-icon">◎</span><b>SEO Services</b><span>We provide best quality services to grow your business online.</span></div>
+      <div class="bs-card bs-piece"><span class="bs-icon">◈</span><b>Social Media</b><span>Engage your audience with creative and innovative solutions.</span></div>
+      <div class="bs-card bs-piece"><span class="bs-icon">◆</span><b>PPC Advertising</b><span>Maximise your ROI with our data-driven campaigns.</span></div>
+    </section>
+  </div>
+
+  <div class="bs-controls">
+    <button type="button" class="bs-unbore" data-bs-go>Ugh. Make it unboring.</button>
+    <button type="button" class="bs-skip" data-bs-skip>Skip</button>
+  </div>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-boring-site]');
+  const html = document.documentElement;
+
+  if (root && html.classList.contains('boring-intro')) {
+    const page = root.querySelector<HTMLElement>('[data-bs-page]')!;
+    const pieces = Array.from(root.querySelectorAll<HTMLElement>('.bs-piece'));
+    const marker = root.querySelectorAll<SVGPathElement>('.bs-marker path');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let done = false;
+
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      const hadFocus = root.contains(document.activeElement);
+      html.classList.remove('boring-intro');
+      root.remove();
+      document.removeEventListener('keydown', onKey);
+      if (hadFocus) document.getElementById('main')?.focus({ preventScroll: true });
+    };
+
+    const destroy = async () => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      root.classList.add('is-going');
+      // Safety net: if the browser stalls the animations (throttled tab, odd engine), never trap the page.
+      setTimeout(finish, reduce ? 800 : 2500);
+
+      if (reduce) {
+        await root.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 400, easing: 'ease-out', fill: 'forwards' }).finished;
+        return finish();
+      }
+
+      // 1. Cross it out with the lime marker.
+      const strokes = Array.from(marker).map((p, i) => {
+        const len = p.getTotalLength();
+        p.style.strokeDasharray = `${len}`;
+        return p.animate([{ strokeDashoffset: len }, { strokeDashoffset: 0 }], {
+          duration: 260, delay: i * 140, easing: 'cubic-bezier(.6,0,.4,1)', fill: 'forwards',
+        }).finished;
+      });
+      await Promise.all(strokes);
+
+      // 2. Demolish it. Every piece falls, spins a bit, and takes the white background with it.
+      const vh = window.innerHeight;
+      const falls = pieces.map((el, i) => {
+        const spin = (i % 2 ? 1 : -1) * (8 + Math.random() * 22);
+        const drift = (Math.random() - 0.5) * 120;
+        return el.animate(
+          [
+            { transform: 'translate(0,0) rotate(0)', opacity: 1 },
+            { transform: `translate(${drift}px, ${vh * 1.2}px) rotate(${spin}deg)`, opacity: 0 },
+          ],
+          { duration: 760, delay: 80 + i * 55, easing: 'cubic-bezier(.55,0,.9,.45)', fill: 'forwards' },
+        ).finished;
+      });
+      const marks = root.querySelector<SVGElement>('.bs-marker')!.animate(
+        [{ transform: 'none' }, { transform: `translateY(${vh * 1.2}px) rotate(-14deg)` }],
+        { duration: 700, delay: 40, easing: 'cubic-bezier(.55,0,.9,.45)', fill: 'forwards' },
+      ).finished;
+      const ground = page.animate([{ backgroundColor: '#ffffff' }, { backgroundColor: 'rgba(255,255,255,0)' }], {
+        duration: 500, delay: 250, easing: 'ease-out', fill: 'forwards',
+      }).finished;
+      root.querySelector('.bs-controls')?.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, fill: 'forwards' });
+
+      await Promise.all([...falls, marks, ground]);
+      finish();
+    };
+
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') finish(); };
+
+    root.querySelector('[data-bs-go]')?.addEventListener('click', destroy);
+    root.querySelector('[data-bs-skip]')?.addEventListener('click', finish);
+    document.addEventListener('keydown', onKey);
+    // Long enough to half-believe it. Short enough not to lose anyone.
+    const timer = setTimeout(destroy, 2200);
+  }
+</script>
+
+<style is:global>
+  .bs { display: none; }
+  html.boring-intro { overflow: hidden; }
+  html.boring-intro .bs {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    overflow: hidden;
+  }
+  .bs-page {
+    position: absolute;
+    inset: 0;
+    background: #ffffff;
+    color: #333;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .bs-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem clamp(1rem, 4vw, 4rem);
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    position: relative;
+    z-index: 2;
+  }
+  .bs-logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: #2f6fde; font-size: 1.15rem; }
+  .bs-logo small { color: #888; font-weight: 400; font-size: 0.75rem; display: block; }
+  .bs-swoosh { width: 1.6rem; height: 1.6rem; border-radius: 50%; background: linear-gradient(135deg, #2f6fde, #7b5ce5); }
+  .bs-links { display: none; gap: 1.75rem; color: #555; font-size: 0.95rem; }
+  .bs-btn {
+    display: inline-block;
+    padding: 0.65rem 1.4rem;
+    border-radius: 999px;
+    background: #2f6fde;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    box-shadow: 0 6px 16px rgba(47, 111, 222, 0.3);
+  }
+  .bs-btn--ghost { background: transparent; color: #fff; border: 2px solid rgba(255, 255, 255, 0.8); box-shadow: none; }
+
+  .bs-hero {
+    position: relative;
+    flex: 1;
+    display: grid;
+    align-content: center;
+    gap: 2rem;
+    padding: 2rem clamp(1rem, 4vw, 4rem);
+    background: linear-gradient(120deg, #2f6fde 0%, #6a5ae0 100%);
+    color: #fff;
+  }
+  .bs-kicker { letter-spacing: 0.2em; font-size: 0.75rem; opacity: 0.85; }
+  .bs-h1 { font-size: clamp(1.9rem, 1rem + 3.4vw, 3.4rem); font-weight: 700; line-height: 1.15; margin: 0.6rem 0 1rem; max-width: 18ch; }
+  .bs-sub { font-size: 1.05rem; opacity: 0.9; max-width: 44ch; }
+  .bs-ctas { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
+  .bs-stock { display: none; background: #fff; border-radius: 18px; padding: 1rem; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2); }
+
+  .bs-marker {
+    position: absolute;
+    left: clamp(0.5rem, 3vw, 3rem);
+    top: 50%;
+    width: min(92%, 52rem);
+    height: 12rem;
+    transform-origin: center;
+    translate: 0 -55%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .bs-marker path {
+    fill: none;
+    stroke: #b8f279;
+    stroke-width: 18;
+    stroke-linecap: round;
+    stroke-dasharray: 2000;
+    stroke-dashoffset: 2000;
+  }
+
+  .bs-services {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    padding: 1.25rem clamp(1rem, 4vw, 4rem);
+    background: #f6f8fc;
+  }
+  .bs-card {
+    display: grid;
+    gap: 0.35rem;
+    justify-items: center;
+    text-align: center;
+    padding: 1rem 0.75rem;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    font-size: 0.8rem;
+    color: #666;
+  }
+  .bs-card b { color: #333; font-size: 0.95rem; }
+  .bs-card > span:last-child { display: none; }
+  .bs-icon {
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    background: #e9eefb;
+    color: #2f6fde;
+    font-size: 1.2rem;
+  }
+
+  .bs-controls {
+    position: absolute;
+    inset: auto 0 0 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem var(--gutter) max(1.25rem, env(safe-area-inset-bottom));
+    pointer-events: none;
+    z-index: 3;
+  }
+  .bs-unbore, .bs-skip { pointer-events: auto; }
+  .bs-unbore {
+    padding: 1rem 1.5rem;
+    background: var(--lime);
+    color: var(--ink);
+    border: var(--rule);
+    box-shadow: var(--shadow);
+    font-family: var(--font-label);
+    font-weight: 700;
+    font-size: var(--step-1);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    transform: rotate(-2deg);
+    animation: bs-nudge 420ms var(--ease-snap) 150ms both;
+  }
+  .bs-unbore:hover { transform: rotate(0) translate(3px, 3px); box-shadow: 3px 3px 0 var(--ink); }
+  .bs-unbore:focus-visible, .bs-skip:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; box-shadow: 0 0 0 6px var(--lime); }
+  .bs-skip {
+    align-self: stretch;
+    padding: 0.5rem 0.9rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: 2px solid var(--ink);
+    font-family: var(--font-label);
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  @keyframes bs-nudge {
+    0% { transform: translateY(140%) rotate(-2deg); }
+    100% { transform: translateY(0) rotate(-2deg); }
+  }
+
+  @media (min-width: 900px) {
+    .bs-links { display: flex; }
+    .bs-hero { grid-template-columns: 1.2fr 1fr; align-items: center; }
+    .bs-stock { display: block; }
+    .bs-card > span:last-child { display: block; }
+    .bs-services { gap: 1.5rem; padding-block: 2rem; }
+    .bs-card { padding: 1.5rem; }
+  }
+  @media (max-width: 899px) {
+    .bs-nav .bs-btn { padding: 0.5rem 1rem; font-size: 0.85rem; }
+    .bs-logo { white-space: nowrap; font-size: 1rem; }
+    .bs-logo small { display: none; }
+    .bs-unbore { flex: 1; font-size: 1rem; padding: 0.9rem 1rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bs-unbore { animation: none; }
+  }
+</style>

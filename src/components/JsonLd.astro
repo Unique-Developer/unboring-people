@@ -1,0 +1,44 @@
+---
+/** Organization + LocalBusiness structured data for the Surat head office. Rendered on the homepage and /talk. */
+import { site } from '../site.config';
+
+const { address } = site.places;
+const url = site.url;
+const data = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${url}/#org`,
+      name: site.name,
+      url,
+      logo: `${url}/icon-512.png`,
+      slogan: site.tagline,
+      email: site.contact.email,
+      sameAs: [`https://instagram.com/${site.contact.instagram}`],
+    },
+    {
+      '@type': 'ProfessionalService',
+      '@id': `${url}/#surat`,
+      name: site.name,
+      description: 'Creative growth agency: brand strategy, creative campaigns, social content, Meta and Google ads, and local SEO.',
+      url,
+      image: `${url}/og/home.png`,
+      telephone: `+${site.contact.whatsappNumber}`,
+      email: site.contact.email,
+      parentOrganization: { '@id': `${url}/#org` },
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: address.street,
+        addressLocality: address.city,
+        addressRegion: address.region,
+        postalCode: address.postalCode,
+        addressCountry: address.country,
+      },
+      areaServed: ['Surat', 'Gujarat', 'India', 'United States'],
+    },
+  ],
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(data)} />

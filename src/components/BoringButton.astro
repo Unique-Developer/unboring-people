@@ -1,0 +1,88 @@
+---
+import { primaryCta } from '../site.config';
+---
+
+<section class="boring" aria-labelledby="boring-title">
+  <h2 id="boring-title" class="sr-only">The boring button</h2>
+  <div class="pair">
+    <button type="button" class="dull" data-boring-button data-cursor="why">Boring button</button>
+    <a class="btn now" href={primaryCta.href} data-cursor={primaryCta.verb}>
+      Now press this one <span class="arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+  <p class="msg" data-boring-msg aria-live="polite">It does nothing. Go on.</p>
+</section>
+
+<script>
+  const KEY = 'up-boring-presses';
+  const btn = document.querySelector<HTMLButtonElement>('[data-boring-button]');
+  const msg = document.querySelector<HTMLElement>('[data-boring-msg]');
+
+  const read = () => {
+    try { return Number(sessionStorage.getItem(KEY)) || 0; } catch { return 0; }
+  };
+  const write = (n: number) => {
+    try { sessionStorage.setItem(KEY, String(n)); } catch { /* private mode: count just won't persist */ }
+  };
+
+  // A few extra lines for the persistent. Everything else gets the standard verdict.
+  const extras: Record<number, string> = {
+    10: 'Ten. You have the stamina of a brand that posts "Good morning" every day.',
+    25: "Twenty-five. We admire the commitment. Imagine it pointed at your marketing.",
+    50: 'Fifty. Okay, you win. Nothing still happened.',
+  };
+
+  const say = (n: number) => {
+    if (!msg) return;
+    if (n === 0) return;
+    const times = n === 1 ? 'once' : `${n} times`;
+    msg.textContent = extras[n] ?? `You pressed the boring button ${times}. Nothing happened. That's the point. Now press this one.`;
+  };
+
+  let count = read();
+  say(count);
+
+  btn?.addEventListener('click', () => {
+    count += 1;
+    write(count);
+    say(count);
+  });
+</script>
+
+<style>
+  .boring {
+    display: grid;
+    gap: 1.25rem;
+  }
+  .pair {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    align-items: stretch;
+  }
+  .dull {
+    flex: 1 1 16rem;
+    min-height: 5.5rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--concrete);
+    color: var(--ink);
+    border: 3px solid var(--concrete);
+    border-radius: 6px; /* the only rounded corner on the site. It's the boring one. */
+    font-family: var(--font-body);
+    font-size: 1.5rem; /* 24px: ink on Concrete Grey is 4.2:1, which passes AA only as large text */
+    font-weight: 500;
+    text-align: center;
+  }
+  .dull:active { background: #6c6c6c; }
+  .now {
+    flex: 1 1 16rem;
+    min-height: 5.5rem;
+    font-size: var(--step-1);
+  }
+  .msg {
+    font-family: var(--font-label);
+    font-weight: 500;
+    min-height: 3em;
+    color: var(--concrete-light);
+  }
+</style>

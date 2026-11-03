@@ -1,0 +1,113 @@
+---
+/**
+ * GA4 and the Meta Pixel, loaded only after the visitor accepts the cookie notice.
+ * While both IDs in site.config.ts are still placeholders, nothing here renders: no notice, no scripts.
+ * The choice is remembered in localStorage ("up-consent": "yes" | "no").
+ */
+import { site, isPlaceholder } from '../site.config';
+
+const { ga4Id, metaPixelId } = site.analytics;
+const ga4 = isPlaceholder(ga4Id) ? '' : ga4Id;
+const pixel = isPlaceholder(metaPixelId) ? '' : metaPixelId;
+const enabled = Boolean(ga4 || pixel);
+---
+
+{enabled && (
+  <div class="consent" role="region" aria-label="Cookie notice" data-consent data-ga4={ga4} data-pixel={pixel} hidden>
+    <p>
+      <strong>Cookies? Only if you say so.</strong> We'd like to use Google Analytics and the Meta Pixel to see what works
+      on this site and in our ads. <a href="/privacy">Details</a>.
+    </p>
+    <div class="actions">
+      <button type="button" class="yes" data-consent-yes>Fine</button>
+      <button type="button" class="no" data-consent-no>No thanks</button>
+    </div>
+  </div>
+)}
+
+<script>
+  const KEY = 'up-consent';
+  const box = document.querySelector<HTMLElement>('[data-consent]');
+  if (box) {
+    const ga4 = box.dataset.ga4;
+    const pixel = box.dataset.pixel;
+
+    const read = () => { try { return localStorage.getItem(KEY); } catch { return null; } };
+    const write = (v: string) => { try { localStorage.setItem(KEY, v); } catch { /* not remembered, asked again next visit */ } };
+
+    let loaded = false;
+    const load = () => {
+      if (loaded) return;
+      loaded = true;
+      const w = window as any;
+      if (ga4) {
+        w.dataLayer = w.dataLayer || [];
+        w.gtag = function gtag() { w.dataLayer.push(arguments); };
+        w.gtag('js', new Date());
+        w.gtag('config', ga4);
+        const s = document.createElement('script');
+        s.async = true;
+        s.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(ga4)}`;
+        document.head.append(s);
+      }
+      if (pixel) {
+        // Standard Meta Pixel bootstrap, unrolled.
+        const fbq: any = function (...args: unknown[]) { fbq.callMethod ? fbq.callMethod(...args) : fbq.queue.push(args); };
+        fbq.push = fbq; fbq.loaded = true; fbq.version = '2.0'; fbq.queue = [];
+        w.fbq = w._fbq = fbq;
+        const s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://connect.facebook.net/en_US/fbevents.js';
+        document.head.append(s);
+        w.fbq('init', pixel);
+        w.fbq('track', 'PageView');
+      }
+    };
+
+    const choice = read();
+    if (choice === 'yes') load();
+    else if (choice !== 'no') box.hidden = false;
+
+    box.querySelector('[data-consent-yes]')!.addEventListener('click', () => { write('yes'); box.hidden = true; load(); });
+    box.querySelector('[data-consent-no]')!.addEventListener('click', () => { write('no'); box.hidden = true; });
+
+    // "Cookie settings" in the footer reopens the notice. Declining after accepting takes effect on the next page.
+    document.querySelectorAll('[data-cookie-settings]').forEach((b) => {
+      (b as HTMLElement).hidden = false;
+      b.addEventListener('click', () => { box.hidden = false; box.querySelector<HTMLButtonElement>('[data-consent-yes]')!.focus(); });
+    });
+  }
+</script>
+
+<style>
+  .consent {
+    position: fixed;
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 95;
+    display: grid;
+    gap: 1rem;
+    max-width: 30rem;
+    padding: 1.1rem 1.25rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: 3px solid var(--paper);
+    box-shadow: var(--shadow-lime);
+    font-size: 0.95rem;
+  }
+  .consent[hidden] { display: none; }
+  .consent a { color: var(--lime); font-weight: 700; }
+  .actions { display: flex; gap: 0.75rem; }
+  .actions button {
+    padding: 0.6rem 1.1rem;
+    border: 3px solid var(--paper);
+    font-family: var(--font-label);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .yes { background: var(--lime); color: var(--ink); border-color: var(--lime) !important; }
+  .no { background: transparent; color: var(--paper); }
+  .consent :focus-visible { outline-color: var(--lime); box-shadow: 0 0 0 6px var(--ink); }
+</style>

@@ -1,0 +1,143 @@
+---
+/**
+ * Desktop-only extras: a lime cursor follower that grows over links and shows a verb (from data-cursor),
+ * and headlines (data-knock) whose letters get knocked out of line on hover.
+ * Off on touch devices and with prefers-reduced-motion. The real cursor is never hidden.
+ */
+---
+
+<div class="cursor" aria-hidden="true" data-cursor-dot><span data-cursor-verb></span></div>
+
+<script>
+  const fine = matchMedia('(hover: hover) and (pointer: fine)');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (fine.matches && !reduce.matches) {
+    const dot = document.querySelector<HTMLElement>('[data-cursor-dot]')!;
+    const verb = dot.querySelector<HTMLElement>('[data-cursor-verb]')!;
+    let x = -100, y = -100, cx = x, cy = y, raf = 0;
+
+    const loop = () => {
+      // Ease towards the pointer. Transform only, so it never triggers layout.
+      cx += (x - cx) * 0.22;
+      cy += (y - cy) * 0.22;
+      dot.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
+      raf = Math.abs(x - cx) + Math.abs(y - cy) > 0.3 ? requestAnimationFrame(loop) : 0;
+    };
+
+    addEventListener('pointermove', (e) => {
+      x = e.clientX;
+      y = e.clientY;
+      dot.classList.add('on');
+      if (!raf) raf = requestAnimationFrame(loop);
+    }, { passive: true });
+    document.documentElement.addEventListener('pointerleave', () => dot.classList.remove('on'));
+
+    const verbFor = (el: Element) => {
+      const tagged = el.closest<HTMLElement>('[data-cursor]');
+      if (tagged) return tagged.dataset.cursor!;
+      const link = el.closest('a, button, summary, label[for]');
+      return link ? (link.matches('a') ? 'go' : 'press') : '';
+    };
+    addEventListener('pointerover', (e) => {
+      const v = verbFor(e.target as Element);
+      verb.textContent = v;
+      dot.classList.toggle('big', !!v);
+    }, { passive: true });
+
+    // Letter knock: split headline text into letters once, then nudge the ones the pointer touches.
+    document.querySelectorAll<HTMLElement>('[data-knock]').forEach((el) => {
+      // Screen readers get one clean copy of the text; the letter-by-letter version is visual only.
+      const plain = Object.assign(document.createElement('span'), { className: 'sr-only', textContent: el.textContent!.trim() });
+      const visual = document.createElement('span');
+      visual.setAttribute('aria-hidden', 'true');
+      visual.append(...Array.from(el.childNodes));
+      el.append(plain, visual);
+      const walker = document.createTreeWalker(visual, NodeFilter.SHOW_TEXT);
+      const nodes: Text[] = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+      for (const node of nodes) {
+        const frag = document.createDocumentFragment();
+        node.data.split(/(\s+)/).forEach((part) => {
+          if (!part) return;
+          if (/^\s+$/.test(part)) return frag.append(part);
+          const word = document.createElement('span');
+          word.className = 'k-word';
+          for (const ch of part) {
+            const s = document.createElement('span');
+            s.className = 'k';
+            s.textContent = ch;
+            word.append(s);
+          }
+          frag.append(word);
+        });
+        node.replaceWith(frag);
+      }
+      el.addEventListener('pointerover', (e) => {
+        const k = (e.target as Element).closest<HTMLElement>('.k');
+        if (!k || k.dataset.hit) return;
+        k.dataset.hit = '1';
+        const r = (Math.random() - 0.5) * 30;
+        const ty = (Math.random() - 0.5) * 0.35;
+        k.style.transform = `translateY(${ty}em) rotate(${r}deg)`;
+        setTimeout(() => {
+          k.style.transform = '';
+          delete k.dataset.hit;
+        }, 900);
+      });
+    });
+  }
+</script>
+
+<style>
+  .cursor {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 300;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--fast);
+  }
+  .cursor.on { opacity: 1; }
+  .cursor::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: -6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--lime);
+    border: 2px solid var(--ink);
+    transition: transform var(--med) var(--ease-snap);
+  }
+  .cursor.big::before { transform: scale(4.6); }
+  .cursor span {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+    opacity: 0;
+    font-family: var(--font-label);
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    white-space: nowrap;
+    transition: opacity var(--fast), transform var(--med) var(--ease-snap);
+  }
+  .cursor.big span { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+  :global(.k-word) { display: inline-block; white-space: nowrap; }
+  :global(.k) {
+    display: inline-block;
+    transition: transform 600ms cubic-bezier(0.2, 1.6, 0.4, 1);
+  }
+  :global(.boring-mode) .cursor { display: none; }
+
+  @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+    .cursor { display: none; }
+  }
+</style>

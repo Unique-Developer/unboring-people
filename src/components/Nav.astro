@@ -1,0 +1,178 @@
+---
+import Logo from './Logo.astro';
+import { nav, primaryCta, site, whatsappLink, defaultWhatsappMessage } from '../site.config';
+
+const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
+const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`);
+---
+
+<header class="site-header">
+  <div class="bar wrap">
+    <a href="/" class="home" aria-label={`${site.name}, home`} data-cursor="home">
+      <Logo />
+    </a>
+
+    <nav class="inline-nav" aria-label="Main">
+      <ul role="list">
+        {nav.map((item) => (
+          <li>
+            <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined} data-cursor={item.verb}>
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <a class="btn cta" href={primaryCta.href} data-cursor={primaryCta.verb}>{primaryCta.label}</a>
+    </nav>
+
+    <!-- <details> keeps the mobile menu working with JavaScript off. -->
+    <details class="menu">
+      <summary class="menu-toggle label">
+        <span class="when-closed">Menu</span>
+        <span class="when-open">Close</span>
+      </summary>
+      <nav class="menu-panel on-ink" aria-label="Main">
+        <ul role="list">
+          {nav.map((item, i) => (
+            <li>
+              <a href={item.href} class="display" aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                <span class="num label" aria-hidden="true">0{i + 1}</span>{item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <div class="menu-ctas">
+          <a class="btn" href={primaryCta.href}>{primaryCta.label} <span class="arrow" aria-hidden="true">→</span></a>
+          <a class="btn btn--ink" href={whatsappLink(defaultWhatsappMessage)} data-track="whatsapp_click" data-source="menu">
+            Talk to us on WhatsApp
+          </a>
+        </div>
+      </nav>
+    </details>
+  </div>
+</header>
+
+<script>
+  const menu = document.querySelector<HTMLDetailsElement>('.menu');
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menu?.open) {
+      menu.open = false;
+      menu.querySelector('summary')?.focus();
+    }
+  });
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--paper);
+    border-bottom: var(--rule);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    min-height: 4.25rem;
+  }
+  .home {
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  /* Desktop */
+  .inline-nav {
+    display: none;
+    align-items: center;
+    gap: clamp(1rem, 2vw, 2rem);
+  }
+  .inline-nav ul {
+    display: flex;
+    gap: clamp(0.75rem, 1.6vw, 1.75rem);
+    padding: 0;
+    list-style: none;
+  }
+  .inline-nav ul a {
+    font-family: var(--font-label);
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    padding: 0.3rem 0.15rem;
+    background-image: linear-gradient(var(--lime), var(--lime));
+    background-size: 0% 100%;
+    background-repeat: no-repeat;
+    transition: background-size var(--med) var(--ease-snap);
+  }
+  .inline-nav ul a:hover,
+  .inline-nav ul a[aria-current='page'] {
+    background-size: 100% 100%;
+  }
+  .cta {
+    min-height: 2.75rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .cta:hover { box-shadow: 2px 2px 0 var(--ink); transform: translate(2px, 2px); }
+
+  /* Mobile */
+  .menu-toggle {
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.5rem 1rem;
+    border: var(--rule);
+    background: var(--lime);
+    cursor: pointer;
+    user-select: none;
+  }
+  .menu-toggle::-webkit-details-marker { display: none; }
+  .when-open { display: none; }
+  .menu[open] .when-open { display: inline; }
+  .menu[open] .when-closed { display: none; }
+  .menu[open] .menu-toggle { background: var(--ink); color: var(--paper); }
+
+  .menu-panel {
+    position: fixed;
+    inset: calc(4.25rem + 3px) 0 0 0;
+    overflow-y: auto;
+    padding: 2rem var(--gutter) 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2.5rem;
+  }
+  .menu-panel ul {
+    padding: 0;
+    list-style: none;
+  }
+  .menu-panel li + li { border-top: 3px solid var(--paper); }
+  .menu-panel a.display {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding-block: 0.9rem;
+    font-size: clamp(2.2rem, 11vw, 4rem);
+    text-decoration: none;
+  }
+  .menu-panel a.display[aria-current='page'] { color: var(--lime); }
+  .menu-panel .num { color: var(--concrete-light); font-size: 0.8rem; }
+  .menu-ctas {
+    display: grid;
+    gap: 1rem;
+  }
+  :global(html:has(.menu[open])) { overflow: hidden; }
+
+  @media (min-width: 1024px) {
+    .inline-nav { display: flex; }
+    .menu { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .inline-nav ul a { transition: none; }
+  }
+</style>

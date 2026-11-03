@@ -1,0 +1,173 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Seats from '../components/Seats.astro';
+import { site, primaryCta, whatsappLink, mailtoLink, emailLine } from '../site.config';
+
+const faqOrder = ['pricing', 'why-three', 'the-catch', 'guarantee', 'ad-budget', 'term', 'new'];
+const faq = (await getCollection('foundingFaq')).sort((a, b) => faqOrder.indexOf(a.id) - faqOrder.indexOf(b.id));
+const { totalSeats, taken } = site.founding;
+const open = totalSeats - taken.length;
+const wa = whatsappLink("Hi UNBORING PEOPLE! I'd like to talk about a founding seat.");
+const email = mailtoLink('Founding seat');
+
+const get = [
+  { t: 'Founder pricing', d: "Below what we'll charge once we have a portfolio. Quoted after your free audit." },
+  { t: 'A free Unboring Audit first', d: 'One page, one honest look at your marketing, one idea. Before you commit to anything.' },
+  { t: 'Our full attention', d: 'Three clients means your brand is never the one we get to on Friday evening.' }, // COPY: check
+  { t: 'Clear goals and plain reports', d: 'We agree what success looks like up front, then report against it in words, not dashboards.' },
+];
+const ask = [
+  { t: 'A case study', d: 'We publish what we did and what happened, with real numbers you approve first.' },
+  { t: 'Honest feedback', d: 'What worked, what didn\'t, and what we should never do again. Out loud.' },
+];
+const steps = [
+  { t: 'Take the test, or just message us', d: 'The Boring Test takes about a minute. WhatsApp takes less.' },
+  { t: 'Get your free Unboring Audit', d: 'We look at your brand, your competitors and your reviews, and send one page with one idea.' },
+  { t: 'Get a proposal', d: 'Fixed deliverables, founder pricing, and every third-party cost listed upfront.' },
+  { t: 'Three months, then month to month', d: "Enough time to test and measure. After that, 30 days' notice. Stay because it's working." },
+];
+---
+
+<Base
+  title="Founding clients: 3 seats at founder pricing"
+  description="UNBORING PEOPLE is taking three founding clients at founder pricing, in exchange for a case study and honest feedback. See what's included, what we ask, and how it works."
+>
+  <PageHeader eyebrow="[03] Founding seats" title="Three seats. That's it." boring="Affordable Pricing Plans">
+    <p>
+      We're new. No portfolio, no case studies, no borrowed logos. So we're doing this the honest way: {totalSeats} founding
+      clients at founder pricing, in exchange for a case study and honest feedback.
+    </p>
+  </PageHeader>
+
+  <section class="seats-band on-ink" aria-labelledby="seats-title">
+    <div class="wrap seats-inner">
+      <h2 id="seats-title" class="display display-m"><span class="mark">{taken.length} of {totalSeats} taken.</span> {open} open.</h2>
+      <Seats />
+      <p class="label muted">This number is real. When a seat goes, it shows here, with the client's industry and city.</p>
+    </div>
+  </section>
+
+  <section class="deal" aria-labelledby="deal-title">
+    <div class="wrap deal-inner">
+      <h2 id="deal-title" class="sr-only">The deal</h2>
+      <div class="side">
+        <h3 class="display display-s">What you get</h3>
+        <ul role="list">{get.map((x) => <li><strong>{x.t}</strong><span>{x.d}</span></li>)}</ul>
+      </div>
+      <div class="side ask">
+        <h3 class="display display-s">What we ask</h3>
+        <ul role="list">{ask.map((x) => <li><strong>{x.t}</strong><span>{x.d}</span></li>)}</ul>
+        <p class="price label">Pricing? Founder pricing. Ask us.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="how on-lime" aria-labelledby="how-title">
+    <div class="wrap how-inner">
+      <h2 id="how-title" class="display display-l">How it works</h2>
+      <ol role="list" class="steps">
+        {steps.map((s, i) => (
+          <li>
+            <span class="n display" aria-hidden="true">{i + 1}</span>
+            <strong>{s.t}</strong>
+            <span>{s.d}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="faq" aria-labelledby="faq-title">
+    <div class="wrap faq-inner">
+      <h2 id="faq-title" class="display display-l">Fair questions</h2>
+      <div class="list">
+        {faq.map((f) => (
+          <details>
+            <summary>{f.data.q}</summary>
+            <p>{f.data.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="end on-ink" aria-labelledby="end-title">
+    <div class="wrap end-inner">
+      <h2 id="end-title" class="display display-l">Want a seat?</h2>
+      <div class="ctas">
+        <a class="btn" href={wa} data-track="whatsapp_click" data-source="founding" data-cursor="sit">Talk to us on WhatsApp</a>
+        <a class="btn btn--ink" href={primaryCta.href} data-cursor={primaryCta.verb}>{primaryCta.label}</a>
+      </div>
+      {email && <p>{emailLine} Email <a href={email} data-track="email_click" data-source="founding">{site.contact.email}</a></p>}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .seats-band { border-bottom: var(--rule); }
+  .seats-inner { display: grid; gap: 2.5rem; padding-block: var(--section); }
+  .seats-inner :global(.seats) { max-width: 60rem; }
+
+  .deal { border-bottom: var(--rule); }
+  .deal-inner { display: grid; gap: 3rem; padding-block: var(--section); }
+  .side { display: grid; gap: 1.5rem; align-content: start; }
+  .side ul { display: grid; padding: 0; list-style: none; border-top: var(--rule); }
+  .side li { display: grid; gap: 0.3rem; padding-block: 1.1rem; border-bottom: var(--rule); }
+  .side strong { font-family: var(--font-label); text-transform: uppercase; letter-spacing: 0.04em; }
+  .ask { padding: clamp(1.25rem, 3vw, 2rem); border: var(--rule); box-shadow: var(--shadow); background: var(--paper); }
+  .price { padding: 0.6rem 0.8rem; background: var(--lime); border: var(--rule); justify-self: start; }
+
+  .how { border-bottom: var(--rule); }
+  .how-inner { display: grid; gap: 2.5rem; padding-block: var(--section); }
+  .steps { display: grid; gap: 1.5rem; padding: 0; list-style: none; counter-reset: none; }
+  .steps li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.25rem 1.25rem;
+    padding: 1.25rem;
+    background: var(--paper);
+    border: var(--rule);
+    box-shadow: var(--shadow);
+  }
+  .steps .n { grid-row: span 2; font-size: clamp(3rem, 2rem + 3vw, 4.5rem); line-height: 0.8; }
+  .steps strong { font-size: var(--step-1); line-height: 1.2; }
+
+  .faq { border-bottom: var(--rule); }
+  .faq-inner { display: grid; gap: 2.5rem; padding-block: var(--section); }
+  .list { border-top: var(--rule); }
+  details { border-bottom: var(--rule); }
+  summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 1.25rem;
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: var(--step-1);
+    line-height: 1.1;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: '+'; flex-shrink: 0; font-size: 1.5em; line-height: 0.7; }
+  details[open] summary::after { content: '–'; }
+  summary:hover { background: linear-gradient(var(--lime), var(--lime)) 0 100% / 100% 0.3em no-repeat; }
+  details p { padding-bottom: 1.5rem; font-size: var(--step-1); line-height: 1.45; }
+
+  .end-inner { display: grid; gap: 1.75rem; padding-block: var(--section); }
+  .end-inner a:not(.btn) { color: var(--lime); font-weight: 700; overflow-wrap: anywhere; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 1rem; }
+
+  @media (min-width: 900px) {
+    .deal-inner { grid-template-columns: 1.2fr 1fr; }
+    .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .faq-inner { grid-template-columns: 1fr 2fr; align-items: start; }
+  }
+  @media (min-width: 1200px) {
+    .steps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .steps li { grid-template-columns: 1fr; }
+    .steps .n { grid-row: auto; margin-bottom: 0.75rem; }
+  }
+</style>

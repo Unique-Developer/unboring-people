@@ -1,0 +1,20 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { primaryCta, whatsappLink, defaultWhatsappMessage } from '../site.config';
+---
+
+<Base title="Message received" description="Your message reached UNBORING PEOPLE. We'll reply within one working day." index={false}>
+  <PageHeader eyebrow="Sent" title="Got it. That wasn't boring." ground="lime">
+    <!-- COPY: check (reply-time promise) -->
+    <p>Your message is with us. A real person replies within one working day, from Surat or New Jersey, whichever is awake.</p>
+    <div class="ctas">
+      <a class="btn btn--ink" href={primaryCta.href}>While you wait: {primaryCta.label}</a>
+      <a class="btn btn--paper" href={whatsappLink(defaultWhatsappMessage)} data-track="whatsapp_click" data-source="thanks">Can't wait? WhatsApp us</a>
+    </div>
+  </PageHeader>
+</Base>
+
+<style>
+  .ctas { display: flex; flex-wrap: wrap; gap: 1rem; }
+</style>

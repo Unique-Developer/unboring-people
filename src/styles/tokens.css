@@ -1,0 +1,41 @@
+/* UNBORING PEOPLE design tokens. Change the brand here, nowhere else. */
+:root {
+  /* Brand colours */
+  --ink: #111111;
+  --lime: #b8f279;
+  --paper: #f5f3eb;
+  --concrete: #777777;       /* Large text on ink only (4.2:1). Never small text. */
+  --concrete-light: #9a9a9a; /* Small secondary text on ink (6.7:1). */
+  --ink-soft: #555555;       /* Small secondary text on paper (6.7:1). */
+  --boring-blue: #2f6fde;    /* Only for the Boring Site parody. Never in the real design. */
+
+  /* Type */
+  --font-display: 'Archivo Black', 'Arial Black', Impact, sans-serif;
+  --font-label: 'Space Grotesk', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --font-body: 'DM Sans', Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Fluid type scale */
+  --step--1: clamp(0.8rem, 0.78rem + 0.1vw, 0.875rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --step-1: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --step-2: clamp(1.6rem, 1.35rem + 1.2vw, 2.25rem);
+  --step-3: clamp(2.2rem, 1.6rem + 3vw, 4rem);
+  --step-4: clamp(2rem, 0.4rem + 7.4vw, 7rem); /* fits a 13-letter word at 360px */
+  --step-5: clamp(2.5rem, 0.1rem + 12.3vw, 13rem); /* fits a 10-letter word at 360px */
+
+  /* Space */
+  --gutter: clamp(1rem, 0.6rem + 2vw, 2.5rem);
+  --section: clamp(4rem, 3rem + 6vw, 9rem);
+  --max: 1440px;
+
+  /* Brutalist edges */
+  --rule: 3px solid var(--ink);
+  --shadow: 6px 6px 0 var(--ink);
+  --shadow-lime: 6px 6px 0 var(--lime);
+  --press: translate(6px, 6px);
+
+  /* Motion */
+  --ease-snap: cubic-bezier(0.2, 0.9, 0.1, 1);
+  --fast: 120ms;
+  --med: 280ms;
+}

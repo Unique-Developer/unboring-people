@@ -1,0 +1,99 @@
+---
+import Bridge from './Bridge.astro';
+import { site } from '../site.config';
+
+interface Props {
+  label?: string;
+}
+const { label = '[07] Two clocks, one agency' } = Astro.props;
+const { home, away } = site.places;
+---
+
+<section class="clocks" aria-labelledby="clocks-title" data-clocks data-home-tz={home.timeZone} data-away-tz={away.timeZone}>
+  <div class="wrap inner">
+    <h2 id="clocks-title" class="label">{label}</h2>
+    <div class="faces">
+      <p class="face">
+        <span class="city label">{home.city} <span class="muted">{home.label}</span></span>
+        <time class="t display" data-clock="home">{home.label}</time>
+      </p>
+      <Bridge class="mid" />
+      <p class="face">
+        <span class="city label">{away.city} <span class="muted">{away.label}</span></span>
+        <time class="t display" data-clock="away">{away.label}</time>
+      </p>
+    </div>
+    <p class="line lede" data-clock-line>
+      Head office in {home.city}. A teammate on {away.city} time. Someone here is always awake thinking about your brand.
+    </p>
+  </div>
+</section>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-clocks]');
+  if (root) {
+    const homeTz = root.dataset.homeTz!;
+    const awayTz = root.dataset.awayTz!;
+    const homeEl = root.querySelector<HTMLTimeElement>('[data-clock="home"]')!;
+    const awayEl = root.querySelector<HTMLTimeElement>('[data-clock="away"]')!;
+    const lineEl = root.querySelector<HTMLElement>('[data-clock-line]')!;
+
+    // Intl handles daylight saving in New Jersey; India has none.
+    const fmt = (tz: string) => new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', minute: '2-digit', hour12: true });
+    const hourIn = (tz: string) => Number(new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', hourCycle: 'h23' }).format(new Date()));
+    const homeFmt = fmt(homeTz);
+    const awayFmt = fmt(awayTz);
+    const pretty = (f: Intl.DateTimeFormat, d: Date) => f.format(d).replace(/\s?([AP])M/, (_, x) => ` ${x.toLowerCase()}m`);
+    const awake = (h: number) => h >= 7 && h < 23;
+
+    const tick = () => {
+      const now = new Date();
+      const s = pretty(homeFmt, now);
+      const n = pretty(awayFmt, now);
+      homeEl.textContent = s;
+      awayEl.textContent = n;
+      homeEl.dateTime = now.toISOString();
+      awayEl.dateTime = now.toISOString();
+
+      const hs = hourIn(homeTz);
+      const ha = hourIn(awayTz);
+      let line: string;
+      if (awake(hs) && awake(ha)) line = `${s} in Surat. ${n} in New Jersey. We're both up. Good time to talk.`;
+      else if (awake(hs)) line = `${s} in Surat. ${n} in New Jersey. Someone here is always awake thinking about your brand.`;
+      else if (awake(ha)) line = `${s} in Surat, where we're asleep. ${n} in New Jersey, where we're not.`;
+      else line = `${s} in Surat. ${n} in New Jersey. Even we sleep sometimes. Leave a message, we'll be up soon.`;
+      lineEl.textContent = line;
+    };
+
+    tick();
+    // Align to the next minute, then tick every minute.
+    setTimeout(() => { tick(); setInterval(tick, 60_000); }, 60_000 - (Date.now() % 60_000));
+  }
+</script>
+
+<style>
+  .clocks { border-bottom: var(--rule); }
+  .inner {
+    display: grid;
+    gap: 2rem;
+    padding-block: clamp(3rem, 6vw, 5rem);
+  }
+  .faces {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1rem 2rem;
+  }
+  .face { display: grid; gap: 0.5rem; }
+  .t {
+    font-size: clamp(2.6rem, 1rem + 7vw, 6.5rem);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.04em;
+    text-transform: lowercase;
+  }
+  .faces :global(.mid) { width: clamp(3rem, 6vw, 5rem); height: auto; margin-bottom: 1.2rem; }
+  .line { max-width: 40ch; }
+  @media (max-width: 599px) {
+    .faces :global(.mid) { display: none; }
+  }
+</style>

@@ -1,0 +1,191 @@
+---
+/**
+ * /start: the Instagram link-in-bio page. One narrow column, thumb-first. The test is the hero; links sit below.
+ * Replaces the old standalone "UNBORING PEOPLE Links.html".
+ */
+import Base from '../layouts/Base.astro';
+import BoringTest from '../components/BoringTest.astro';
+import Bridge from '../components/Bridge.astro';
+import { site, whatsappLink, defaultWhatsappMessage, mailtoLink, emailLine } from '../site.config';
+
+const { totalSeats, taken } = site.founding;
+const open = totalSeats - taken.length;
+const email = mailtoLink('Bored of my marketing');
+
+const links = [
+  {
+    href: whatsappLink(defaultWhatsappMessage),
+    icon: '/icons/talk.png',
+    title: 'Get your free Unboring Audit',
+    sub: 'One page. One crazy idea for your brand. On WhatsApp.',
+    hot: true,
+    track: 'whatsapp_click',
+    verb: 'talk',
+  },
+  {
+    href: '/founding',
+    badge: String(totalSeats),
+    title: 'Founding client seats',
+    tag: `${open} of ${totalSeats} open`,
+    sub: 'Founder pricing in exchange for a case study.',
+    verb: 'sit',
+  },
+  { href: '/lab', icon: '/icons/lab.png', title: 'The Unboring Lab', sub: 'Crazy-but-doable campaign ideas. Steal one.', verb: 'steal' },
+  { href: '/services', icon: '/icons/services.png', title: 'What we do', sub: 'Identity. Ideas. Content. Performance. Presence.', verb: 'read' },
+  {
+    href: `https://instagram.com/${site.contact.instagram}`,
+    icon: '/icons/bts.png',
+    title: 'Behind the scenes',
+    sub: `@${site.contact.instagram} on Instagram`,
+    verb: 'look',
+  },
+];
+---
+
+<Base
+  title="UNBORING PEOPLE: start here"
+  description="Take the Boring Test, get a free Unboring Audit, or steal an idea from The Lab."
+  index={false}
+  bare
+>
+  <div class="col">
+    <p class="top label">
+      <span><i class="dot" aria-hidden="true"></i>{open} of {totalSeats} founding seats open</span>
+      <span class="cities">Surat <Bridge /><span class="sr-only">and</span> NJ</span>
+    </p>
+
+    <header class="brand on-ink">
+      <h1 class="display">Unboring<br /> <span>People</span></h1>
+      <p>{site.positioning}</p>
+      <p class="label small">Creative growth agency</p>
+    </header>
+
+    <div class="test on-lime">
+      <BoringTest variant="compact" as="h2" />
+    </div>
+
+    <nav aria-label="Links">
+      <ul class="links" role="list">
+        {links.map((l, i) => (
+          <li>
+            <a
+              class:list={['link', { hot: l.hot }]}
+              href={l.href}
+              data-track={l.track}
+              data-source={l.track ? 'start' : undefined}
+              data-cursor={l.verb}
+            >
+              {l.icon
+                ? <img src={l.icon} alt="" width="56" height="56" loading={i > 1 ? 'lazy' : 'eager'} decoding="async" />
+                : <span class="badge" aria-hidden="true">{l.badge}</span>}
+              <span class="txt">
+                <strong>{l.title} {l.tag && <span class="tag label">{l.tag}</span>}</strong>
+                <small>{l.sub}</small>
+              </span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <footer class="foot">
+      <p class="display">{site.tagline}</p>
+      {email && (
+        <p>{emailLine} Email <a href={email} data-track="email_click" data-source="start">{site.contact.email}</a></p>
+      )}
+      <a class="label full" href="/">See the full site <span aria-hidden="true">→</span></a>
+    </footer>
+  </div>
+</Base>
+
+<style>
+  .col {
+    width: 100%;
+    max-width: 30rem;
+    margin-inline: auto;
+    padding: 1.25rem 1rem 3rem;
+    display: grid;
+    gap: 1.25rem;
+  }
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+  .dot {
+    display: inline-block;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin-right: 0.45rem;
+    border-radius: 50%;
+    background: var(--lime);
+    border: 2px solid var(--ink);
+    vertical-align: middle;
+  }
+  .cities { display: inline-flex; align-items: center; gap: 0.35rem; }
+
+  .brand {
+    padding: 1.4rem 1.25rem 1.25rem;
+    border: var(--rule);
+    box-shadow: var(--shadow-lime);
+    display: grid;
+    gap: 0.75rem;
+  }
+  .brand h1 { font-size: clamp(2.4rem, 12vw, 4rem); line-height: 0.86; } /* "UNBORING" must fit a 360px phone */
+  .brand h1 span { color: var(--lime); }
+  .brand p { font-size: 1.1rem; font-weight: 500; }
+  .brand .small { font-size: 0.75rem; color: var(--concrete-light); }
+
+  .test {
+    padding: 1.25rem;
+    border: var(--rule);
+    box-shadow: var(--shadow);
+  }
+
+  .links { display: grid; gap: 0.9rem; padding: 0; list-style: none; }
+  .link {
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.75rem 1rem 0.75rem 0.75rem;
+    background: var(--paper);
+    border: var(--rule);
+    box-shadow: 4px 4px 0 var(--ink);
+    text-decoration: none;
+    transition: transform var(--fast) var(--ease-snap), box-shadow var(--fast) var(--ease-snap);
+  }
+  .link:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
+  .link:active { transform: translate(4px, 4px); box-shadow: none; }
+  .link.hot { background: var(--lime); }
+  .link img, .badge { width: 3.5rem; height: 3.5rem; border-radius: 50%; }
+  .link.hot img { outline: 2px solid var(--ink); }
+  .badge {
+    display: grid;
+    place-items: center;
+    background: var(--ink);
+    color: var(--lime);
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+  }
+  .txt { display: grid; gap: 0.15rem; }
+  .txt strong { font-weight: 700; font-size: 1.05rem; line-height: 1.2; }
+  .txt small { font-size: 0.9rem; color: var(--ink-soft); }
+  .tag {
+    display: inline-block;
+    margin-left: 0.35rem;
+    padding: 0.05rem 0.4rem;
+    background: var(--ink);
+    color: var(--lime);
+    font-size: 0.65rem;
+    vertical-align: 0.15em;
+  }
+  .arrow { font-family: var(--font-display); font-size: 1.25rem; }
+
+  .foot { display: grid; gap: 0.75rem; padding-top: 1rem; border-top: var(--rule); }
+  .foot .display { font-size: 1.6rem; line-height: 0.95; }
+  .foot a { font-weight: 700; overflow-wrap: anywhere; }
+  .full { justify-self: start; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .link { transition: none; }
+    .link:hover { transform: none; }
+  }
+</style>

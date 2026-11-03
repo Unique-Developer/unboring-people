@@ -1,0 +1,91 @@
+---
+/**
+ * Boring mode: flips the whole site into its generic-agency twin. Mostly CSS (styles/boring-mode.css).
+ * Elements with data-boring="..." swap their text while it's on. State lasts for the session.
+ * The early class is set by the inline script in Base.astro, so there's no flash on navigation.
+ */
+---
+
+<button type="button" class="toggle" data-boring-toggle aria-pressed="false">
+  Boring mode: <span data-boring-state>off</span>
+</button>
+
+<div class="banner" data-boring-banner hidden>
+  <p>You're in boring mode. Hard to look at, isn't it?</p>
+  <button type="button" data-boring-off>Make it unboring</button>
+</div>
+
+<script>
+  const KEY = 'up-boring-mode';
+  const html = document.documentElement;
+  const toggle = document.querySelector<HTMLButtonElement>('[data-boring-toggle]');
+  const state = document.querySelector<HTMLElement>('[data-boring-state]');
+  const banner = document.querySelector<HTMLElement>('[data-boring-banner]');
+
+  const swap = (on: boolean) => {
+    document.querySelectorAll<HTMLElement>('[data-boring]').forEach((el) => {
+      if (on) {
+        if (el.dataset.original === undefined) el.dataset.original = el.innerHTML;
+        el.textContent = el.dataset.boring!;
+      } else if (el.dataset.original !== undefined) {
+        el.innerHTML = el.dataset.original;
+      }
+    });
+  };
+
+  const set = (on: boolean) => {
+    html.classList.toggle('boring-mode', on);
+    toggle?.setAttribute('aria-pressed', String(on));
+    if (state) state.textContent = on ? 'on' : 'off';
+    if (banner) banner.hidden = !on;
+    swap(on);
+    try { on ? sessionStorage.setItem(KEY, '1') : sessionStorage.removeItem(KEY); } catch { /* fine */ }
+  };
+
+  set(html.classList.contains('boring-mode'));
+  toggle?.addEventListener('click', () => set(!html.classList.contains('boring-mode')));
+  document.querySelector('[data-boring-off]')?.addEventListener('click', () => {
+    set(false);
+    toggle?.focus();
+  });
+</script>
+
+<style>
+  .toggle {
+    padding: 0;
+    background: none;
+    border: 0;
+    color: var(--paper);
+    font: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+  .toggle:hover { color: var(--lime); }
+  .banner {
+    position: fixed;
+    inset: auto 1rem 1rem 1rem;
+    z-index: 90;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem 1.25rem;
+    padding: 1rem 1.25rem;
+    /* Hard-coded brand colours: the way out of boring mode is never boring. */
+    background: #b8f279;
+    color: #111111;
+    border: 3px solid #111111;
+    box-shadow: 6px 6px 0 #111111;
+    font-family: 'Space Grotesk', ui-monospace, monospace;
+    font-weight: 700;
+  }
+  .banner[hidden] { display: none; }
+  .banner button {
+    padding: 0.5rem 1rem;
+    background: #111111;
+    color: #f5f3eb;
+    border: 3px solid #111111;
+    font: inherit;
+    text-transform: uppercase;
+  }
+</style>

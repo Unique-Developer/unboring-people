@@ -1,0 +1,13 @@
+---
+/** The Surat ⇄ New Jersey two-way arrow. Drawn, because none of the brand fonts has the ⇄ glyph. */
+interface Props { class?: string }
+const { class: className } = Astro.props;
+---
+
+<svg class:list={['bridge-arrows', className]} viewBox="0 0 48 24" aria-hidden="true" focusable="false">
+  <path d="M4 7h38M34 1l8 6-8 6M44 17H6M14 11l-8 6 8 6" fill="none" stroke="currentColor" stroke-width="3" />
+</svg>
+
+<style>
+  .bridge-arrows { display: inline-block; width: 2.4em; height: 1.2em; vertical-align: middle; flex-shrink: 0; }
+</style>

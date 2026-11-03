@@ -1,0 +1,227 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import JsonLd from '../components/JsonLd.astro';
+import { site, whatsappLink, defaultWhatsappMessage, mailtoLink, emailLine } from '../site.config';
+
+const email = mailtoLink('Bored of my marketing');
+const { home, away, address } = site.places;
+---
+
+<Base
+  title="Talk to us: WhatsApp, email or a short form"
+  description="Start a conversation with UNBORING PEOPLE on WhatsApp or email, or tell us what's boring about your marketing. Creative growth agency in Surat, India. Free Unboring Audit."
+>
+  <JsonLd slot="head" />
+  <PageHeader eyebrow="[05] Talk" title="Tell us what's boring." boring="Contact Us">
+    <!-- COPY: check (reply-time promise) -->
+    <p>WhatsApp is fastest. Email works too. Or fill in five boxes and we'll reply within one working day.</p>
+  </PageHeader>
+
+  <section class="talk" aria-label="Ways to reach us">
+    <div class="wrap grid">
+      <div class="ways">
+        <a class="wa" href={whatsappLink(defaultWhatsappMessage)} data-track="whatsapp_click" data-source="talk" data-cursor="talk">
+          <span class="label">WhatsApp</span>
+          <span class="display big">{site.contact.whatsappDisplay}</span>
+          <span class="label go">Start the chat <span aria-hidden="true">→</span></span>
+        </a>
+
+        {email && (
+          <p class="email">
+            {emailLine} Email <a href={email} data-track="email_click" data-source="talk" data-cursor="email">{site.contact.email}</a>
+          </p>
+        )}
+
+        <dl class="where">
+          <div>
+            <dt class="label">{home.role}</dt>
+            <dd>{address.street},<br />{address.city} {address.postalCode}, {home.country}</dd>
+          </div>
+          <div>
+            <dt class="label">{away.role}</dt>
+            <dd>{away.city}, {away.country}</dd>
+          </div>
+          <div>
+            <dt class="label">Instagram</dt>
+            <dd><a href={`https://instagram.com/${site.contact.instagram}`}>@{site.contact.instagram}</a></dd>
+          </div>
+        </dl>
+      </div>
+
+      <form
+        class="form"
+        name={site.forms.talkFormName}
+        method="POST"
+        action="/thanks"
+        data-netlify="true"
+        netlify-honeypot="company-url"
+        data-talk-form
+        data-wa={site.contact.whatsappNumber}
+      >
+        <input type="hidden" name="form-name" value={site.forms.talkFormName} />
+        <p class="hp" aria-hidden="true">
+          <label>Leave this empty <input name="company-url" tabindex="-1" autocomplete="off" /></label>
+        </p>
+
+        <h2 class="display display-s">Five boxes. No sales call unless you want one.</h2>
+
+        <div class="field">
+          <label for="f-name" class="label">Your name</label>
+          <input id="f-name" name="name" type="text" autocomplete="name" required />
+        </div>
+        <div class="field">
+          <label for="f-business" class="label">Business</label>
+          <input id="f-business" name="business" type="text" autocomplete="organization" required />
+        </div>
+        <div class="field">
+          <label for="f-link" class="label">Website or Instagram <span class="opt">(optional)</span></label>
+          <input id="f-link" name="link" type="text" inputmode="url" placeholder="@yourbrand or yourbrand.com" />
+        </div>
+        <div class="field">
+          <label for="f-boring" class="label">What's boring about your marketing?</label>
+          <textarea id="f-boring" name="boring" rows="5" required placeholder="Be honest. Nobody's watching."></textarea>
+        </div>
+        <div class="field">
+          <label for="f-contact" class="label">Phone or email, so we can reply</label>
+          <input id="f-contact" name="contact" type="text" autocomplete="email" required />
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn" data-cursor="send">Send it <span class="arrow" aria-hidden="true">→</span></button>
+          <button type="button" class="btn btn--paper js-only" data-talk-wa data-cursor="talk">Send on WhatsApp instead</button>
+        </div>
+        <p class="small muted">We use this only to reply to you. See the <a href="/privacy">privacy policy</a>.</p>
+        <p class="status" role="status" aria-live="polite" data-talk-status></p>
+      </form>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { track } from '../scripts/track';
+
+  const form = document.querySelector<HTMLFormElement>('[data-talk-form]')!;
+  const status = form.querySelector<HTMLElement>('[data-talk-status]')!;
+  const number = form.dataset.wa!;
+
+  const asMessage = () => {
+    const d = new FormData(form);
+    const v = (k: string) => String(d.get(k) ?? '').trim();
+    return [
+      'Hi UNBORING PEOPLE!',
+      v('name') && `I'm ${v('name')}${v('business') ? ` from ${v('business')}` : ''}.`,
+      v('link') && `We're at ${v('link')}.`,
+      v('boring') && `What's boring about our marketing: ${v('boring')}`,
+    ].filter(Boolean).join(' ');
+  };
+
+  const openWhatsapp = (source: string) => {
+    track('whatsapp_click', { source });
+    window.open(`https://wa.me/${number}?text=${encodeURIComponent(asMessage())}`, '_blank', 'noopener');
+  };
+
+  form.querySelector('[data-talk-wa]')?.addEventListener('click', () => openWhatsapp('talk-form'));
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    button.disabled = true;
+    status.textContent = 'Sending…';
+    try {
+      const body = new URLSearchParams(new FormData(form) as unknown as Record<string, string>).toString();
+      const res = await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+      if (!res.ok) throw new Error(String(res.status));
+      location.href = '/thanks';
+    } catch {
+      // Form service down or unreachable: don't lose the message, hand it to WhatsApp.
+      status.innerHTML = '';
+      status.append(
+        "That didn't send. Your answers are still here. ",
+        Object.assign(document.createElement('button'), {
+          type: 'button',
+          className: 'retry',
+          textContent: 'Send them on WhatsApp instead',
+          onclick: () => openWhatsapp('talk-form-fallback'),
+        }),
+      );
+      button.disabled = false;
+    }
+  });
+</script>
+
+<style>
+  .talk { border-bottom: var(--rule); }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3rem;
+    padding-block: var(--section);
+  }
+  .ways { display: grid; gap: 2rem; align-content: start; }
+  .wa {
+    display: grid;
+    gap: 0.5rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    background: var(--lime);
+    border: var(--rule);
+    box-shadow: var(--shadow);
+    text-decoration: none;
+    transition: transform var(--fast) var(--ease-snap), box-shadow var(--fast) var(--ease-snap);
+  }
+  .wa:hover { transform: translate(3px, 3px); box-shadow: 3px 3px 0 var(--ink); }
+  .big { font-size: clamp(1.8rem, 1rem + 3.5vw, 3.2rem); line-height: 1; }
+  .go { justify-self: start; border-bottom: 3px solid var(--ink); }
+  .email { font-family: var(--font-label); font-weight: 500; font-size: var(--step-1); }
+  .email a { font-weight: 700; text-decoration-color: var(--lime); text-decoration-thickness: 4px; overflow-wrap: anywhere; }
+  .where { display: grid; gap: 1.25rem; }
+  .where div { display: grid; gap: 0.25rem; padding-top: 0.75rem; border-top: var(--rule); }
+  .where dd { margin: 0; font-weight: 500; }
+
+  .form {
+    display: grid;
+    gap: 1.25rem;
+    padding: clamp(1.25rem, 3vw, 2.25rem);
+    background: var(--paper);
+    border: var(--rule);
+    box-shadow: var(--shadow);
+    align-content: start;
+  }
+  .hp { position: absolute; left: -9999px; }
+  .field { display: grid; gap: 0.5rem; }
+  .opt { opacity: 0.7; text-transform: none; letter-spacing: 0; font-weight: 500; }
+  input, textarea {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.75rem 1rem;
+    border: var(--rule);
+    background: #fff;
+    color: var(--ink);
+    font-size: var(--step-0);
+  }
+  textarea { resize: vertical; line-height: 1.45; }
+  ::placeholder { color: var(--ink-soft); }
+  .actions { display: flex; flex-wrap: wrap; gap: 1rem; }
+  :global(.no-js) .js-only { display: none; }
+  .small { font-size: 0.9rem; }
+  .status { font-weight: 500; min-height: 1.5em; }
+  .status :global(.retry) {
+    margin-left: 0.25rem;
+    padding: 0;
+    background: none;
+    border: 0;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: var(--lime);
+    text-decoration-thickness: 3px;
+  }
+
+  @media (min-width: 1000px) {
+    .grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 4rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wa { transition: none; }
+    .wa:hover { transform: none; }
+  }
+</style>

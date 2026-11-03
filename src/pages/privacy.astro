@@ -1,0 +1,101 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { site, mailtoLink } from '../site.config';
+
+const email = mailtoLink('Privacy question');
+const { address } = site.places;
+---
+
+<Base title="Privacy policy" description="How UNBORING PEOPLE handles the little data this site collects, in plain language.">
+  <PageHeader eyebrow="Privacy" title="Privacy, in plain words.">
+    <p>What this site collects, why, who else sees it, and how to make us delete it. No legalese where we can avoid it.</p>
+  </PageHeader>
+
+  <article class="wrap policy">
+    <p class="review placeholder">
+      [REVIEW: This is a plain-language draft, not legal advice. Have it checked against India's Digital Personal Data
+      Protection Act, 2023 and any US state privacy laws that apply before launch.]
+    </p>
+    <p class="label">Last updated: 3 November 2026</p>
+
+    <h2>Who we are</h2>
+    <p>
+      {site.name}, {address.street}, {address.city} {address.postalCode}, Gujarat, India. Questions about your data go to
+      {email ? <a href={email}>{site.contact.email}</a> : site.contact.email}.
+    </p>
+
+    <h2>What we collect, and why</h2>
+    <h3>The contact form</h3>
+    <p>
+      If you use the form on our Talk page, we get your name, business, website or Instagram, your message, and your phone
+      or email. We use it only to reply to you and, if you hire us, to work with you. The form is run by Netlify, our
+      website host, which stores submissions for us.
+    </p>
+    <h3>WhatsApp and email</h3>
+    <p>
+      When you message us on WhatsApp or by email, we see what you send. WhatsApp (Meta) and the email providers handle those
+      messages under their own privacy policies.
+    </p>
+    <h3>The Boring Test</h3>
+    <p>
+      Your answers and score stay in your browser. We don't receive them unless you choose to send them to us, for example by
+      tapping the WhatsApp button on your result. The shareable score card is made in your browser and never uploaded by us.
+    </p>
+    <h3>Analytics and ads</h3>
+    <p>
+      If you accept our cookie notice, we use Google Analytics 4 to count visits and see which pages work, and the Meta Pixel
+      to measure our ads on Facebook and Instagram. Both set cookies and send usage data to Google and Meta. If you decline,
+      neither loads. You can change your mind at any time from the link in the footer.
+    </p>
+    <h3>Things your browser remembers</h3>
+    <p>
+      To avoid showing you the same joke twice, the site keeps a few small notes in your browser's session storage: whether
+      you've seen the intro, how many times you pressed the boring button, and whether boring mode is on. They never leave
+      your device and disappear when you close the tab.
+    </p>
+
+    <h2>Who else sees it</h2>
+    <p>
+      Only the services named above: Netlify, Google, Meta (including WhatsApp), and our email provider. We don't sell your
+      data. We don't share it with anyone else unless the law requires us to.
+    </p>
+
+    <h2>How long we keep it</h2>
+    <p>Messages and form submissions: up to 24 months after our last conversation, unless you ask us to delete them sooner.</p>
+
+    <h2>Your choices</h2>
+    <p>
+      You can ask us what we hold about you, ask us to correct it, or ask us to delete it. Email us and we'll do it within
+      30 days. You can also decline analytics cookies, or clear them in your browser.
+    </p>
+
+    <h2>Changes</h2>
+    <p>If we change this policy, we'll update it here and change the date at the top.</p>
+  </article>
+</Base>
+
+<style>
+  .policy {
+    display: grid;
+    gap: 1rem;
+    max-width: 52rem;
+    margin-inline: 0;
+    padding-block: var(--section);
+  }
+  .review { padding: 1rem; line-height: 1.5; font-size: 0.95rem; }
+  .policy h2 {
+    margin-top: 2rem;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-weight: 400;
+    font-size: var(--step-2);
+    line-height: 1;
+  }
+  .policy h3 { margin-top: 0.75rem; font-family: var(--font-label); text-transform: uppercase; letter-spacing: 0.04em; font-size: 1rem; }
+  .policy p { max-width: 65ch; }
+  .policy a { text-decoration-color: var(--lime); text-decoration-thickness: 3px; font-weight: 700; }
+  @media (min-width: 1000px) {
+    .policy { margin-left: max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter) + 10%)); }
+  }
+</style>

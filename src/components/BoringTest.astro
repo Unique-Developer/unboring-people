@@ -1,0 +1,420 @@
+---
+/**
+ * The Boring Test. Used full-size on /test and compact on /start.
+ * Questions and verdicts come from src/content. Scoring: each answer is 0-2, total (max 12) is scaled to 0-10.
+ */
+import { getCollection } from 'astro:content';
+import { site, whatsappLink, defaultWhatsappMessage } from '../site.config';
+
+interface Props {
+  variant?: 'page' | 'compact';
+  /** Heading level for the intro title: h1 on /test, h2 on /start. */
+  as?: 'h1' | 'h2';
+}
+const { variant = 'page', as: Heading = 'h1' } = Astro.props;
+
+const questions = (await getCollection('testQuestions')).sort((a, b) => a.id.localeCompare(b.id));
+const verdicts = (await getCollection('testVerdicts')).sort((a, b) => a.data.min - b.data.min);
+
+const data = {
+  questions: questions.map((q) => q.data),
+  verdicts: verdicts.map((v) => v.data),
+  whatsapp: site.contact.whatsappNumber,
+  email: site.contact.email,
+};
+---
+
+<section class:list={['bt', `bt--${variant}`]} data-boring-test aria-label="The Boring Test">
+  <script type="application/json" data-bt-data set:html={JSON.stringify(data)} />
+
+  <!-- Intro -->
+  <div class="screen intro" data-screen="intro">
+    <p class="label eyebrow"><span>The Boring Test</span><span>{questions.length} questions</span></p>
+    <Heading class="display title">How boring is your brand?</Heading>
+    <p class="lede">Be honest. Nobody's watching. Six quick questions, one Boring Score out of 10, and a free audit if you want one.</p>
+    <button type="button" class="btn btn--ink start" data-bt-start data-cursor="test">Start the test <span class="arrow" aria-hidden="true">→</span></button>
+    <p class="label note">A playful score, not a scientific one.</p>
+
+    <noscript>
+      <div class="nojs">
+        <p>The score needs JavaScript. Here are the questions anyway. Count 2 points for each first answer, 1 for each second, 0 for each third, then send us your total.</p>
+        <ol>
+          {questions.map((q) => (
+            <li>
+              <strong>{q.data.question}</strong>
+              <ul>{q.data.answers.map((a) => <li>{a.text} ({a.score})</li>)}</ul>
+            </li>
+          ))}
+        </ol>
+        <a class="btn" href={whatsappLink(defaultWhatsappMessage)}>Send us your score on WhatsApp</a>
+      </div>
+    </noscript>
+  </div>
+
+  <!-- One question at a time -->
+  <div class="screen q" data-screen="q" hidden>
+    <div class="progress">
+      <p class="label" data-bt-count>Question 1 of {questions.length}</p>
+      <div class="bar" aria-hidden="true"><i data-bt-bar></i></div>
+    </div>
+    <h2 class="display qtext" tabindex="-1" data-bt-question></h2>
+    <div class="opts" role="group" aria-label="Answers" data-bt-opts></div>
+    <button type="button" class="back label" data-bt-back>← Back</button>
+  </div>
+
+  <!-- Result -->
+  <div class="screen result" data-screen="result" hidden>
+    <div class="verdict">
+      <p class="label">Your Boring Score</p>
+      <p class="score" aria-live="polite"><b data-bt-score>0</b><span>/10</span></p>
+      <h2 class="display vtitle" tabindex="-1" data-bt-vtitle></h2>
+      <p class="lede" data-bt-v1></p>
+      <p class="lede" data-bt-v2></p>
+
+      <div class="field">
+        <label for="bt-handle" class="label">Business name or Instagram handle <span class="opt-tag">(optional)</span></label>
+        <input id="bt-handle" type="text" autocomplete="organization" maxlength="40" placeholder="@yourbrand" data-bt-handle />
+      </div>
+
+      <div class="ctas">
+        <a class="btn" href="#" data-bt-wa data-track="whatsapp_click" data-source="test-result" data-cursor="talk">
+          Get my free Unboring Audit <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="btn btn--paper" href="#" data-bt-email data-track="email_click" data-source="test-result" data-cursor="email">Email us instead</a>
+      </div>
+      <p class="label note">On WhatsApp the message is already typed. Just hit send.</p>
+    </div>
+
+    <div class="card">
+      <canvas data-bt-canvas role="img" aria-label="Your Boring Score card"></canvas>
+      <div class="card-actions">
+        <button type="button" class="btn btn--ink" data-bt-download>Download my score card</button>
+        <button type="button" class="btn btn--paper" data-bt-share hidden>Share it</button>
+      </div>
+      <p class="label note">A playful score, not a scientific one. Post it. Tag us. Make your competitors take it.</p>
+      <button type="button" class="back label" data-bt-retake>Take it again</button>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { track } from '../scripts/track';
+  import { drawCard, cardBlob } from '../scripts/result-card';
+
+  type Answer = { text: string; score: 0 | 1 | 2 };
+  type Data = {
+    questions: { question: string; answers: Answer[] }[];
+    verdicts: { min: number; max: number; title: string; lines: string[] }[];
+    whatsapp: string;
+    email: string;
+  };
+
+  const root = document.querySelector<HTMLElement>('[data-boring-test]');
+  if (root) {
+    const $ = <T extends Element = HTMLElement>(sel: string) => root.querySelector<T>(sel)!;
+    const data: Data = JSON.parse($('[data-bt-data]').textContent!);
+    const { questions, verdicts } = data;
+    const MAX = questions.length * 2;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const screens = {
+      intro: $('[data-screen="intro"]'),
+      q: $('[data-screen="q"]'),
+      result: $('[data-screen="result"]'),
+    };
+    const answers: (number | undefined)[] = [];
+    let index = 0;
+    let started = false;
+    let score = 0;
+    let verdict = verdicts[0];
+
+    const show = (name: keyof typeof screens) => {
+      for (const [k, el] of Object.entries(screens)) {
+        el.hidden = k !== name;
+        if (k === name && !reduce) {
+          el.classList.remove('enter');
+          void el.offsetWidth; // restart the animation
+          el.classList.add('enter');
+        }
+      }
+    };
+
+    const begin = (source: string) => {
+      if (started) return;
+      started = true;
+      track('test_started', { source });
+    };
+
+    const renderQuestion = (focus = true) => {
+      const q = questions[index];
+      $('[data-bt-count]').textContent = `Question ${index + 1} of ${questions.length}`;
+      $('[data-bt-bar]').style.width = `${(index / questions.length) * 100}%`;
+      $('[data-bt-question]').textContent = q.question;
+      const opts = $('[data-bt-opts]');
+      opts.replaceChildren(
+        ...q.answers.map((a, i) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'opt';
+          b.dataset.cursor = 'pick';
+          b.setAttribute('aria-pressed', String(answers[index] === i));
+          b.innerHTML = `<span class="key" aria-hidden="true">${'ABC'[i]}</span><span></span>`;
+          (b.lastElementChild as HTMLElement).textContent = a.text;
+          b.addEventListener('click', () => choose(i));
+          return b;
+        }),
+      );
+      $<HTMLButtonElement>('[data-bt-back]').hidden = false;
+      show('q');
+      if (focus) $('[data-bt-question]').focus({ preventScroll: false });
+    };
+
+    const choose = (i: number) => {
+      answers[index] = i;
+      if (index < questions.length - 1) {
+        index += 1;
+        renderQuestion();
+      } else {
+        finish();
+      }
+    };
+
+    const messageFor = () => {
+      const handle = $<HTMLInputElement>('[data-bt-handle]').value.trim();
+      return `Hi UNBORING PEOPLE! My Boring Score is ${score}/10${handle ? ` (${handle})` : ''}. I'd like my free Unboring Audit.`;
+    };
+
+    const updateLinks = () => {
+      const msg = messageFor();
+      $<HTMLAnchorElement>('[data-bt-wa]').href = `https://wa.me/${data.whatsapp}?text=${encodeURIComponent(msg)}`;
+      const subject = `My Boring Score is ${score}/10`;
+      $<HTMLAnchorElement>('[data-bt-email]').href =
+        `mailto:${data.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(msg)}`;
+    };
+
+    const canvas = $<HTMLCanvasElement>('[data-bt-canvas]');
+    const redraw = () => {
+      const handle = $<HTMLInputElement>('[data-bt-handle]').value.trim();
+      canvas.setAttribute('aria-label', `Your Boring Score card: ${score} out of 10. ${verdict.title}`);
+      return drawCard(canvas, { score, title: verdict.title, handle: handle || undefined });
+    };
+
+    const finish = () => {
+      const raw = answers.reduce<number>((sum, a, i) => sum + (a === undefined ? 0 : questions[i].answers[a].score), 0);
+      score = Math.round((raw * 10) / MAX);
+      verdict = verdicts.find((v) => score >= v.min && score <= v.max) ?? verdicts[verdicts.length - 1];
+
+      $('[data-bt-score]').textContent = String(score);
+      $('[data-bt-vtitle]').textContent = verdict.title;
+      $('[data-bt-v1]').textContent = verdict.lines[0];
+      $('[data-bt-v2]').textContent = verdict.lines[1];
+      root.dataset.verdict = String(score);
+      updateLinks();
+      redraw();
+      show('result');
+      $('[data-bt-vtitle]').focus();
+      track('test_completed', { score });
+    };
+
+    // Handle typed: update the prefilled messages now, redraw the card when typing pauses.
+    let t = 0;
+    $('[data-bt-handle]').addEventListener('input', () => {
+      updateLinks();
+      clearTimeout(t);
+      t = window.setTimeout(redraw, 250);
+    });
+
+    $('[data-bt-start]').addEventListener('click', () => {
+      begin('test-intro');
+      index = 0;
+      renderQuestion();
+    });
+
+    $('[data-bt-back]').addEventListener('click', () => {
+      if (index === 0) {
+        show('intro');
+        $<HTMLButtonElement>('[data-bt-start]').focus();
+      } else {
+        index -= 1;
+        renderQuestion();
+      }
+    });
+
+    $('[data-bt-retake]').addEventListener('click', () => {
+      answers.length = 0;
+      index = 0;
+      started = false;
+      begin('retake');
+      renderQuestion();
+    });
+
+    const fileName = () => `my-boring-score-${score}.png`;
+    $('[data-bt-download]').addEventListener('click', async () => {
+      await redraw();
+      const blob = await cardBlob(canvas);
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const a = Object.assign(document.createElement('a'), { href: url, download: fileName() });
+      document.body.append(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      track('result_card_downloaded', { score, method: 'download' });
+    });
+
+    // On phones, the share sheet is the fastest route to an Instagram story.
+    const shareBtn = $<HTMLButtonElement>('[data-bt-share]');
+    const probe = new File([''], 'x.png', { type: 'image/png' });
+    if (navigator.canShare?.({ files: [probe] })) {
+      shareBtn.hidden = false;
+      shareBtn.addEventListener('click', async () => {
+        await redraw();
+        const blob = await cardBlob(canvas);
+        if (!blob) return;
+        try {
+          await navigator.share({
+            files: [new File([blob], fileName(), { type: 'image/png' })],
+            text: `My Boring Score is ${score}/10. How boring is yours? unboringpeople.com/test`,
+          });
+          track('result_card_downloaded', { score, method: 'share' });
+        } catch {
+          /* share sheet dismissed */
+        }
+      });
+    }
+
+    // Answered question 1 on the homepage? Carry it over and go straight to question 2.
+    const q1 = new URLSearchParams(location.search).get('q1');
+    if (q1 !== null && /^[0-2]$/.test(q1)) {
+      answers[0] = Number(q1);
+      begin('home-teaser');
+      index = 1;
+      renderQuestion(false);
+      history.replaceState(null, '', location.pathname);
+    }
+  }
+</script>
+
+<style>
+  .bt { position: relative; }
+  .screen { display: grid; gap: 1.5rem; align-content: start; }
+  .screen[hidden] { display: none; }
+  .screen.enter { animation: enter 320ms var(--ease-snap) both; }
+  @keyframes enter {
+    from { opacity: 0; transform: translateY(1.25rem); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* Intro */
+  .eyebrow { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .title { font-size: var(--step-5); max-width: 9ch; }
+  .bt--compact .title { font-size: clamp(2.4rem, 1rem + 8vw, 3.6rem); }
+  .start { justify-self: start; font-size: var(--step-1); }
+  :global(.no-js) .start { display: none; }
+  .note { opacity: 0.85; }
+  .nojs { display: grid; gap: 1rem; padding: 1.25rem; border: var(--rule); background: var(--paper); }
+  .nojs ol { display: grid; gap: 0.75rem; padding-left: 1.25rem; }
+
+  /* Questions */
+  .progress { display: grid; gap: 0.6rem; }
+  .bar { height: 12px; border: var(--rule); background: var(--paper); }
+  .bar i { display: block; height: 100%; width: 0; background: var(--ink); transition: width var(--med) var(--ease-snap); }
+  .qtext {
+    font-size: clamp(1.9rem, 1rem + 4vw, 4.25rem);
+    line-height: 0.95;
+    max-width: 18ch;
+    outline: none;
+  }
+  .bt--compact .qtext { font-size: clamp(1.6rem, 1rem + 4vw, 2.2rem); }
+  .opts { display: grid; gap: 0.9rem; max-width: 46rem; }
+  .opts :global(.opt) {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    padding: 1rem 1.15rem;
+    text-align: left;
+    background: var(--paper);
+    color: var(--ink);
+    border: var(--rule);
+    box-shadow: 4px 4px 0 var(--ink);
+    font-size: var(--step-1);
+    font-weight: 500;
+    line-height: 1.25;
+    transition: transform var(--fast) var(--ease-snap), box-shadow var(--fast) var(--ease-snap), background var(--fast);
+  }
+  .opts :global(.opt:hover) { background: var(--lime); transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
+  .opts :global(.opt:active) { transform: translate(4px, 4px); box-shadow: none; }
+  .opts :global(.opt[aria-pressed='true']) { background: var(--lime); }
+  .opts :global(.key) {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid var(--ink);
+    font-family: var(--font-label);
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+  .back {
+    justify-self: start;
+    padding: 0.4rem 0;
+    background: none;
+    border: 0;
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  /* Result */
+  .result { gap: 2.5rem; }
+  .verdict { display: grid; gap: 1rem; align-content: start; }
+  .score { display: flex; align-items: flex-end; gap: 0.5rem; line-height: 0.8; }
+  .score b {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(7rem, 4rem + 18vw, 15rem);
+    letter-spacing: -0.05em;
+    font-variant-numeric: tabular-nums;
+  }
+  .score span { font-family: var(--font-display); font-size: clamp(2rem, 1rem + 4vw, 4rem); padding-bottom: 0.15em; }
+  .vtitle { font-size: clamp(2rem, 1rem + 4vw, 4rem); line-height: 0.95; outline: none; }
+  .verdict .lede { margin: 0; }
+  .field { display: grid; gap: 0.5rem; margin-top: 0.75rem; max-width: 28rem; }
+  .opt-tag { opacity: 0.7; font-weight: 500; text-transform: none; letter-spacing: 0; }
+  .field input {
+    min-height: 3.25rem;
+    padding: 0.75rem 1rem;
+    border: var(--rule);
+    background: var(--paper);
+    color: var(--ink);
+    font-size: var(--step-1);
+  }
+  .field input::placeholder { color: var(--ink-soft); }
+  .ctas { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 0.5rem; }
+
+  .card { display: grid; gap: 1rem; align-content: start; justify-items: start; }
+  .card canvas {
+    width: 100%;
+    max-width: 26rem;
+    height: auto;
+    aspect-ratio: 1080 / 1350;
+    border: var(--rule);
+    box-shadow: var(--shadow);
+    background: var(--ink);
+  }
+  .card-actions { display: flex; flex-wrap: wrap; gap: 1rem; }
+
+  .bt--page .result { grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 1000px) {
+    .bt--page .result { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: start; }
+    .bt--page .card canvas { transform: rotate(2deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .screen.enter { animation: none; }
+    .bar i, .opts :global(.opt) { transition: none; }
+    .opts :global(.opt:hover) { transform: none; }
+  }
+</style>

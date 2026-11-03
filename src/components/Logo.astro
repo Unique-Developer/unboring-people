@@ -1,0 +1,40 @@
+---
+interface Props {
+  /** Show the "!?" mark before the wordmark. */
+  mark?: boolean;
+}
+const { mark = true } = Astro.props;
+---
+
+<span class="logo">
+  {mark && <span class="mark-dot" aria-hidden="true">!?</span>}
+  <span class="word">UNBORING<br class="br" /> PEOPLE</span>
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    line-height: 0.85;
+    letter-spacing: -0.02em;
+  }
+  .mark-dot {
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 50%;
+    background: var(--lime);
+    color: var(--ink);
+    font-size: 1rem;
+    letter-spacing: -0.04em;
+    border: 2px solid var(--ink);
+  }
+  .word { font-size: 1.15rem; }
+  @media (max-width: 380px) {
+    .word { font-size: 1rem; }
+  }
+</style>

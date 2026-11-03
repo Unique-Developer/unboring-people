@@ -1,0 +1,144 @@
+---
+import Bridge from '../Bridge.astro';
+import { site, primaryCta, whatsappLink, defaultWhatsappMessage } from '../../site.config';
+
+const seatsLeft = site.founding.totalSeats - site.founding.taken.length;
+const { home, away } = site.places;
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap inner">
+    <p class="label meta">
+      <span>Creative growth agency</span>
+      <span aria-hidden="true">/</span>
+      <span class="cities">{home.city} <Bridge /><span class="sr-only">and</span> {away.city}</span>
+    </p>
+
+    <h1 id="hero-title" class="display display-xl title" data-knock data-boring="Results-driven digital marketing solutions for your business.">
+      We make brands <span class="mark">impossible</span> to ignore.
+    </h1>
+
+    <a class="sticker" href={whatsappLink(defaultWhatsappMessage)} data-track="whatsapp_click" data-source="hero-sticker" data-cursor="talk">
+      <svg viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+        <defs><path id="sticker-ring" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0" /></defs>
+        <circle cx="100" cy="100" r="97" class="disc" />
+        <g class="ring">
+          <text><textPath href="#sticker-ring" textLength="462">FREE UNBORING AUDIT • FREE UNBORING AUDIT •</textPath></text>
+        </g>
+        <text x="100" y="118" text-anchor="middle" class="core">!?</text>
+      </svg>
+      <span class="sr-only">Get a free Unboring Audit on WhatsApp</span>
+    </a>
+
+    <div class="below">
+      <p class="lede">
+        {site.tagline} We're a creative growth agency for businesses with good products and boring marketing.
+      </p>
+      <div class="ctas">
+        <a class="btn" href={primaryCta.href} data-cursor={primaryCta.verb}>{primaryCta.label} <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="btn btn--ink" href={whatsappLink(defaultWhatsappMessage)} data-track="whatsapp_click" data-source="hero" data-cursor="talk">Talk to us on WhatsApp</a>
+      </div>
+    </div>
+
+    <a class="seats-note label" href="/founding" data-cursor="sit">
+      <span class="dot" aria-hidden="true"></span>
+      Taking {site.founding.totalSeats} founding clients. {seatsLeft} {seatsLeft === 1 ? 'seat' : 'seats'} open.
+      <span aria-hidden="true">→</span>
+    </a>
+  </div>
+</section>
+
+<style>
+  .hero {
+    border-bottom: var(--rule);
+    overflow: hidden;
+  }
+  .inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+    padding-block: clamp(2.5rem, 6vw, 5rem) clamp(2.5rem, 5vw, 4rem);
+  }
+  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; }
+  .cities { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .title { max-width: 11ch; }
+
+  .sticker {
+    position: absolute;
+    right: var(--gutter);
+    top: clamp(9rem, 30vw, 4rem);
+    width: clamp(7.5rem, 22vw, 15rem);
+    aspect-ratio: 1;
+    transform: rotate(-12deg);
+    transition: transform var(--med) var(--ease-snap);
+    z-index: 1;
+  }
+  .sticker:hover { transform: rotate(0deg) scale(1.05); }
+  .sticker svg { width: 100%; height: 100%; overflow: visible; }
+  .disc { fill: var(--lime); stroke: var(--ink); stroke-width: 3; }
+  .ring {
+    transform-origin: 100px 100px;
+    animation: spin 18s linear infinite;
+  }
+  .ring text {
+    font-family: var(--font-label);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    fill: var(--ink);
+  }
+  .core {
+    font-family: var(--font-display);
+    font-size: 54px;
+    fill: var(--ink);
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .below {
+    display: grid;
+    gap: 1.75rem;
+    align-items: end;
+  }
+  .lede { max-width: 34ch; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 1.25rem; }
+
+  .seats-note {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.9rem;
+    border: var(--rule);
+    text-decoration: none;
+    background: var(--paper);
+  }
+  .seats-note:hover { background: var(--lime); }
+  .dot {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    background: var(--lime);
+    border: 2px solid var(--ink);
+    animation: blink 1.6s steps(2, jump-none) infinite;
+  }
+  @keyframes blink { 50% { background: var(--ink); } }
+
+  /* Phones: the sticker sits in the empty corner beside "WE MAKE", clear of every word. */
+  @media (max-width: 699px) {
+    .sticker { top: 2rem; width: 6.5rem; }
+  }
+  @media (min-width: 700px) {
+    .sticker { top: 3rem; }
+  }
+  @media (min-width: 1000px) {
+    .below { grid-template-columns: 1fr auto; }
+    .sticker { top: 4rem; right: calc(var(--gutter) + 2vw); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ring, .dot { animation: none; }
+    .sticker { transition: none; }
+    .sticker:hover { transform: rotate(-12deg); }
+  }
+</style>

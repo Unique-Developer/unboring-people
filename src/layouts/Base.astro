@@ -1,0 +1,86 @@
+---
+import '@fontsource/archivo-black/latin-400.css';
+import '@fontsource/space-grotesk/latin-500.css';
+import '@fontsource/space-grotesk/latin-700.css';
+import '@fontsource/dm-sans/latin-400.css';
+import '@fontsource/dm-sans/latin-500.css';
+import '@fontsource/dm-sans/latin-700.css';
+import '../styles/global.css';
+import '../styles/boring-mode.css';
+import archivoBlack from '@fontsource/archivo-black/files/archivo-black-latin-400-normal.woff2?url';
+
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import Cursor from '../components/Cursor.astro';
+import Analytics from '../components/Analytics.astro';
+import { site } from '../site.config';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Set false for pages that should not be indexed (e.g. /start duplicates the homepage's offers). */
+  index?: boolean;
+  /** Hide the main nav and footer (used by the /start link-in-bio page). */
+  bare?: boolean;
+  ogImage?: string;
+}
+
+const { title, description, index = true, bare = false, ogImage } = Astro.props;
+const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
+const canonical = new URL(Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/', site.url).href;
+// Every page gets a share image: its own if one exists in /og, otherwise the homepage's.
+const ogSlugs = ['services', 'lab', 'test', 'founding', 'manifesto', 'talk'];
+const pathSlug = Astro.url.pathname.replace(/\.html$/, '').replace(/^\/|\/$/g, '');
+const ogImageUrl = new URL(ogImage ?? `/og/${ogSlugs.includes(pathSlug) ? pathSlug : 'home'}.png`, site.url).href;
+---
+
+<!doctype html>
+<html lang="en-IN" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {!index && <meta name="robots" content="noindex, follow" />}
+    <meta name="theme-color" content="#111111" />
+
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preload" href={archivoBlack} as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="en_IN" />
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+    {ogImageUrl && <meta property="og:image:width" content="1200" />}
+    {ogImageUrl && <meta property="og:image:height" content="630" />}
+    <meta name="twitter:card" content={ogImageUrl ? 'summary_large_image' : 'summary'} />
+    {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
+
+    <script is:inline>
+      document.documentElement.classList.replace('no-js', 'js');
+      try { if (sessionStorage.getItem('up-boring-mode')) document.documentElement.classList.add('boring-mode'); } catch (e) {}
+    </script>
+    <slot name="head" />
+  </head>
+  <body>
+    <slot name="before-main" />
+    <a class="skip-link" href="#main">Skip to content</a>
+    {!bare && <Nav />}
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    {!bare && <Footer />}
+    <Cursor />
+    <Analytics />
+    <script>
+      import { bindTracking } from '../scripts/track';
+      bindTracking();
+    </script>
+  </body>
+</html>

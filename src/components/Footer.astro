@@ -1,0 +1,155 @@
+---
+import BoringButton from './BoringButton.astro';
+import Bridge from './Bridge.astro';
+import BoringMode from './BoringMode.astro';
+import { site, nav, primaryCta, whatsappLink, defaultWhatsappMessage, mailtoLink, emailLine } from '../site.config';
+
+const email = mailtoLink('Bored of my marketing');
+const year = new Date().getFullYear();
+const { home, away } = site.places;
+---
+
+<footer class="site-footer on-ink">
+  <div class="wrap top">
+    <p class="kicker display display-l" data-boring="Let's grow your business together.">Less boring.<br /><span class="lime">More business.</span></p>
+    <BoringButton />
+  </div>
+
+  <div class="wrap cols">
+    <nav aria-label="Footer">
+      <h2 class="label head">Pages</h2>
+      <ul role="list">
+        <li><a href={primaryCta.href}>The Boring Test</a></li>
+        {nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+      </ul>
+    </nav>
+
+    <div>
+      <h2 class="label head">Talk</h2>
+      <ul role="list">
+        <li>
+          <a href={whatsappLink(defaultWhatsappMessage)} data-track="whatsapp_click" data-source="footer" data-cursor="talk">
+            WhatsApp {site.contact.whatsappDisplay}
+          </a>
+        </li>
+        <li>
+          {emailLine} Email{' '}
+          {email
+            ? <a href={email} data-track="email_click" data-source="footer" data-cursor="email">{site.contact.email}</a>
+            : <span class="placeholder">{site.contact.email}</span>}
+        </li>
+        <li><a href={`https://instagram.com/${site.contact.instagram}`} rel="me">Instagram @{site.contact.instagram}</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="label head">Where</h2>
+      <p class="bridge">
+        <span><strong>{home.city}</strong>, {home.country}<br /><span class="muted">{home.role}</span></span>
+        <Bridge class="arrows" />
+        <span><strong>{away.city}</strong>, {away.country}<br /><span class="muted">{away.role}</span></span>
+      </p>
+    </div>
+  </div>
+
+  <div class="wordmark-wrap" aria-hidden="true">
+    <p class="wordmark display">UNBORING PEOPLE</p>
+  </div>
+
+  <div class="wrap legal">
+    <p>© {year} {site.name}. {site.tagline}</p>
+    <ul role="list">
+      <li><a href="/privacy">Privacy</a></li>
+      <li><BoringMode /></li>
+      <li><button type="button" class="cookie-btn" data-cookie-settings hidden>Cookie settings</button></li>
+    </ul>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: auto;
+    border-top: var(--rule);
+    overflow: hidden;
+  }
+  .top {
+    display: grid;
+    gap: 3rem;
+    padding-block: var(--section) 4rem;
+  }
+  .kicker { max-width: 12ch; }
+  .lime { color: var(--lime); }
+
+  .cols {
+    display: grid;
+    gap: 2.5rem;
+    padding-block: 3rem;
+    border-top: 3px solid var(--paper);
+  }
+  .head {
+    color: var(--lime);
+    margin-bottom: 1rem;
+  }
+  .cols ul {
+    display: grid;
+    gap: 0.6rem;
+    padding: 0;
+    list-style: none;
+  }
+  .cols a {
+    text-decoration: none;
+    font-weight: 500;
+    background-image: linear-gradient(var(--lime), var(--lime));
+    background-size: 0 3px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size var(--med) var(--ease-snap);
+  }
+  .cols a:hover { background-size: 100% 3px; }
+
+  .bridge {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .bridge strong { font-family: var(--font-label); text-transform: uppercase; letter-spacing: 0.04em; }
+  .bridge :global(.arrows) { width: 3rem; color: var(--lime); }
+
+  .wordmark-wrap {
+    border-block: 3px solid var(--paper);
+    padding-block: 0.5rem 0;
+  }
+  /* Sized so the wordmark runs exactly gutter to gutter at any width. 10.35em is its measured width. */
+  .wordmark {
+    font-size: calc((100vw - 2 * var(--gutter)) / 10.35);
+    line-height: 0.8;
+    white-space: nowrap;
+    padding-left: var(--gutter);
+    color: var(--paper);
+    transform: translateY(0.08em);
+  }
+
+  .legal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 1.5rem;
+    font-family: var(--font-label);
+    font-size: var(--step--1);
+    color: var(--concrete-light);
+  }
+  .legal ul { display: flex; gap: 1.5rem; padding: 0; list-style: none; }
+  .legal a, .cookie-btn { color: var(--paper); }
+  .cookie-btn { padding: 0; background: none; border: 0; font: inherit; text-decoration: underline; text-underline-offset: 0.18em; }
+  .cookie-btn[hidden] { display: none; }
+
+  @media (min-width: 900px) {
+    .top { grid-template-columns: 1fr 1fr; align-items: end; }
+    .cols { grid-template-columns: 1fr 1fr 1.3fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cols a { transition: none; }
+  }
+</style>

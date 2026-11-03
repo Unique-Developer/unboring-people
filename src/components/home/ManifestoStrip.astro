@@ -1,0 +1,65 @@
+---
+import { site } from '../../site.config';
+---
+
+<section class="strip on-ink" aria-labelledby="belief-title">
+  <div class="wrap inner">
+    <p class="label lime">[01] What we believe</p>
+    <h2 id="belief-title" class="display display-m belief" data-boring="We are passionate about delivering excellence to our valued clients.">
+      Great brands don't need to <span class="strike">shout louder.</span>
+      They need to give people <span class="mark">something worth talking&nbsp;about.</span>
+    </h2>
+    <ul class="lines label" role="list">
+      {site.lines.map((line) => <li>{line}</li>)}
+    </ul>
+    <a class="more label" href="/manifesto" data-cursor="read">Read the manifesto <span aria-hidden="true">→</span></a>
+  </div>
+</section>
+
+<style>
+  .strip { border-bottom: var(--rule); }
+  .inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
+    padding-block: var(--section);
+  }
+  .lime { color: var(--lime); }
+  .belief { max-width: 18ch; line-height: 0.95; }
+  .strike {
+    position: relative;
+    color: var(--concrete);
+    white-space: nowrap;
+  }
+  .strike::after {
+    content: '';
+    position: absolute;
+    left: -0.05em;
+    right: -0.05em;
+    top: 46%;
+    height: 0.14em;
+    background: var(--lime);
+    transform: rotate(-2deg);
+  }
+  .lines {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    padding: 0;
+    list-style: none;
+    color: var(--concrete-light);
+  }
+  .lines li + li::before {
+    content: '/';
+    margin-right: 1.5rem;
+    color: var(--lime);
+  }
+  .more {
+    justify-self: start;
+    color: var(--paper);
+    text-decoration: underline;
+    text-decoration-color: var(--lime);
+    text-decoration-thickness: 3px;
+  }
+  .more:hover { color: var(--lime); }
+</style>

@@ -1,0 +1,158 @@
+---
+import { getCollection } from 'astro:content';
+
+const cliches = await getCollection('neverSay');
+---
+
+<section class="never on-ink" aria-labelledby="never-title" data-never>
+  <div class="wrap head">
+    <h2 id="never-title" class="label lime">[05] Things we'll never say</h2>
+    <button type="button" class="pause label" data-never-pause aria-pressed="false">Pause</button>
+  </div>
+
+  <div class="viewport">
+    <div class="track" data-never-track>
+      <ul class="set" role="list">
+        {cliches.map((c) => <li class="item display"><span class="txt">{c.data.text}</span></li>)}
+      </ul>
+      <!-- Second copy makes the loop seamless. Screen readers only get the first. -->
+      <ul class="set" role="list" aria-hidden="true">
+        {cliches.map((c) => <li class="item display"><span class="txt">{c.data.text}</span></li>)}
+      </ul>
+    </div>
+    <span class="center" aria-hidden="true"></span>
+  </div>
+
+  <p class="wrap foot lede">This is our honesty policy. No fake reviews, no borrowed logos, no promises about going viral.</p>
+</section>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-never]');
+  const track = root?.querySelector<HTMLElement>('[data-never-track]');
+  const pause = root?.querySelector<HTMLButtonElement>('[data-never-pause]');
+
+  if (root && track && pause) {
+    const items = Array.from(track.querySelectorAll<HTMLElement>('.item'));
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+    let visible = false;
+    let raf = 0;
+
+    // A cliché is struck the moment its leading edge reaches the centre line. Stateless, so the loop never drifts.
+    const check = () => {
+      const mid = window.innerWidth / 2;
+      for (const el of items) {
+        const r = el.getBoundingClientRect();
+        el.classList.toggle('struck', r.left < mid);
+      }
+      raf = visible ? requestAnimationFrame(check) : 0;
+    };
+
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting && !reduce.matches;
+      if (visible && !raf) raf = requestAnimationFrame(check);
+    }).observe(root);
+
+    pause.addEventListener('click', () => {
+      const paused = root.classList.toggle('is-paused');
+      pause.setAttribute('aria-pressed', String(paused));
+      pause.textContent = paused ? 'Play' : 'Pause';
+    });
+
+    root.classList.add('is-live');
+  }
+</script>
+
+<style>
+  .never {
+    padding-block: var(--section);
+    border-bottom: var(--rule);
+    overflow: hidden;
+  }
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  .lime { color: var(--lime); }
+  .pause {
+    padding: 0.4rem 0.8rem;
+    background: transparent;
+    color: var(--paper);
+    border: 2px solid var(--paper);
+  }
+  .pause:hover { background: var(--paper); color: var(--ink); }
+
+  .viewport {
+    position: relative;
+    border-block: 3px solid var(--paper);
+    padding-block: clamp(1rem, 2vw, 1.75rem);
+  }
+  .track {
+    display: flex;
+    width: max-content;
+    animation: marquee 48s linear infinite;
+  }
+  .never.is-paused .track,
+  .viewport:hover .track { animation-play-state: paused; }
+  .set {
+    display: flex;
+    padding: 0;
+    list-style: none;
+  }
+  .item {
+    font-size: clamp(1.9rem, 0.8rem + 5vw, 5.5rem);
+    white-space: nowrap;
+    padding-inline: clamp(1.25rem, 3vw, 3rem);
+    color: var(--paper);
+  }
+  .item + .item, .set + .set .item:first-child { border-left: 3px solid var(--concrete); }
+  .txt { position: relative; display: inline-block; }
+
+  /* The lime marker. Drawn left to right, slightly drunk. */
+  .txt::after {
+    content: '';
+    position: absolute;
+    left: -0.08em;
+    right: -0.08em;
+    top: 44%;
+    height: 0.16em;
+    background: var(--lime);
+    transform: rotate(-1.5deg) scaleX(0);
+    transform-origin: left center;
+    transition: transform 380ms var(--ease-snap);
+  }
+  .item.struck .txt { color: var(--concrete); }
+  .item.struck .txt::after { transform: rotate(-1.5deg) scaleX(1); }
+  .item .txt { transition: color 380ms; }
+
+  /* Without JavaScript nothing tracks the centre line, so strike everything. */
+  :global(.no-js) .never .txt { color: var(--concrete); }
+  :global(.no-js) .never .txt::after { transform: rotate(-1.5deg) scaleX(1); }
+
+  .center {
+    position: absolute;
+    top: -0.75rem;
+    bottom: -0.75rem;
+    left: 50%;
+    width: 3px;
+    background: var(--lime);
+    opacity: 0.5;
+  }
+  .foot { margin-top: 2.5rem; color: var(--paper); }
+
+  @keyframes marquee { to { transform: translateX(-50%); } }
+
+  /* Calm version: no movement. The list wraps and every cliché arrives already crossed out. */
+  @media (prefers-reduced-motion: reduce) {
+    .track { animation: none; width: auto; padding-inline: var(--gutter); }
+    .set { flex-wrap: wrap; gap: 0.25rem 0; }
+    .set[aria-hidden='true'] { display: none; }
+    .item { font-size: clamp(1.6rem, 1rem + 3vw, 3rem); white-space: normal; padding-inline: 0 1.5rem; }
+    .item + .item { border-left: 0; }
+    .txt { color: var(--concrete); }
+    .txt::after { transform: rotate(-1.5deg) scaleX(1); transition: none; }
+    .center, .pause { display: none; }
+  }
+</style>

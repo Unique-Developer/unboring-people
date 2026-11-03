@@ -1,0 +1,42 @@
+---
+/** A real case study. Only ever fed from src/content/work, and only with results the client approved. */
+import { render, type CollectionEntry } from 'astro:content';
+
+interface Props {
+  study: CollectionEntry<'work'>;
+}
+const { study } = Astro.props;
+const { Content } = await render(study);
+const { client, industry, city, headline, objective, results } = study.data;
+---
+
+<article class="study" id={study.id} aria-labelledby={`work-${study.id}`}>
+  <p class="label meta"><span>{client}</span><span>{industry} / {city}</span></p>
+  <h2 id={`work-${study.id}`} class="display display-m">{headline}</h2>
+  <p class="label goal">Goal: {objective}</p>
+  {results.length > 0 && (
+    <dl class="results">
+      {results.map((r) => (
+        <div><dt class="label">{r.label}</dt><dd class="display">{r.value}</dd></div>
+      ))}
+    </dl>
+  )}
+  <div class="body"><Content /></div>
+</article>
+
+<style>
+  .study {
+    display: grid;
+    gap: 1.25rem;
+    padding: clamp(1.25rem, 3vw, 2.25rem);
+    border: var(--rule);
+    box-shadow: var(--shadow);
+    background: var(--paper);
+  }
+  .meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; border-bottom: 2px solid var(--ink); padding-bottom: 0.6rem; }
+  .goal { justify-self: start; padding: 0.3rem 0.6rem; background: var(--lime); border: 2px solid var(--ink); }
+  .results { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 1rem; }
+  .results div { padding: 1rem; background: var(--ink); color: var(--paper); }
+  .results dt { color: var(--lime); }
+  .results dd { margin: 0.4rem 0 0; font-size: var(--step-3); line-height: 0.9; }
+</style>

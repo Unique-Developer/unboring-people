@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+import BoringSite from '../components/home/BoringSite.astro';
+import Hero from '../components/home/Hero.astro';
+import ManifestoStrip from '../components/home/ManifestoStrip.astro';
+import ServiceRows from '../components/home/ServiceRows.astro';
+import LabTeaser from '../components/home/LabTeaser.astro';
+import TestTeaser from '../components/home/TestTeaser.astro';
+import NeverSay from '../components/NeverSay.astro';
+import SeatsTeaser from '../components/home/SeatsTeaser.astro';
+import Clocks from '../components/Clocks.astro';
+import FinalCta from '../components/home/FinalCta.astro';
+import JsonLd from '../components/JsonLd.astro';
+---
+
+<Base
+  title="UNBORING PEOPLE: creative marketing agency in Surat, India"
+  description="UNBORING PEOPLE is a creative growth agency in Surat, with a teammate on New Jersey time. We make boring brands unforgettable: branding, campaigns, content, ads and local SEO."
+>
+  <JsonLd slot="head" />
+  <BoringSite slot="before-main" />
+  <Hero />
+  <ManifestoStrip />
+  <ServiceRows />
+  <LabTeaser />
+  <TestTeaser />
+  <NeverSay />
+  <SeatsTeaser />
+  <Clocks />
+  <FinalCta />
+</Base>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UNBORING PEOPLE Links</title>
+<meta name="description" content="UNBORING PEOPLE: a creative growth agency in Surat and New Jersey. Take the 30-second Is Your Brand Boring? test and get a free Unboring Audit.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: one narrow brutalist column, like a stack of printed stickers. Quiz is the hero; links sit below it. */
+:root{
+  --ink:#111111;
+  --lime:#B8F279;
+  --paper:#F5F3EB;
+  --concrete:#777777;
+  --line:#111111;
+  --display:"Archivo Black", "Arial Black", Impact, sans-serif;
+  --body:"DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --label:"Space Grotesk", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: light;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--paper);color:var(--ink)}
+body{font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:480px;margin:0 auto;padding:24px 16px 48px;display:flex;flex-direction:column;gap:20px}
+
+/* Header */
+.top{display:flex;justify-content:space-between;align-items:center;font-family:var(--label);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.dot{display:inline-block;width:8px;height:8px;background:var(--lime);border:2px solid var(--ink);border-radius:50%;margin-right:6px;vertical-align:middle}
+.brand{background:var(--ink);color:var(--paper);padding:22px 20px 20px;border:3px solid var(--ink);box-shadow:6px 6px 0 var(--lime)}
+.brand h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,14vw,64px);line-height:.88;letter-spacing:-.02em;text-transform:uppercase}
+.brand h1 span{color:var(--lime)}
+.brand p{margin-top:14px;font-size:17px;font-weight:500;text-wrap:balance}
+.brand small{display:block;margin-top:6px;font-family:var(--label);font-size:12px;color:#bdbbb3;letter-spacing:.06em;text-transform:uppercase}
+
+/* Quiz card */
+.quiz{background:var(--lime);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:20px}
+.eyebrow{font-family:var(--label);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;display:flex;justify-content:space-between;gap:8px}
+.quiz h2{font-family:var(--display);font-weight:400;font-size:32px;line-height:1;margin-top:10px;text-transform:uppercase;text-wrap:balance}
+.quiz .lede{margin-top:8px;font-weight:500}
+.bar{height:10px;border:2px solid var(--ink);background:var(--paper);margin-top:16px}
+.bar i{display:block;height:100%;width:0;background:var(--ink);transition:width .25s ease}
+.q{margin-top:16px}
+.q h3{font-family:var(--body);font-weight:700;font-size:20px;line-height:1.25;text-wrap:balance}
+.opts{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.opt{font:inherit;font-weight:500;text-align:left;background:var(--paper);color:var(--ink);border:2px solid var(--ink);padding:13px 14px;cursor:pointer;box-shadow:3px 3px 0 var(--ink);transition:transform .08s ease, box-shadow .08s ease}
+.opt:hover{background:#fff}
+.opt:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+.opt:focus-visible,.btn:focus-visible,.link:focus-visible,.ghost:focus-visible,input:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.back{margin-top:12px;background:none;border:0;font:inherit;font-family:var(--label);font-size:13px;font-weight:700;text-decoration:underline;cursor:pointer;color:var(--ink)}
+.back[hidden]{display:none}
+
+/* Result */
+.score{display:flex;align-items:flex-end;gap:10px;margin-top:10px}
+.score b{font-family:var(--display);font-weight:400;font-size:96px;line-height:.85;font-variant-numeric:tabular-nums}
+.score span{font-family:var(--display);font-size:28px;line-height:1;padding-bottom:6px}
+.verdict{font-family:var(--display);font-weight:400;font-size:28px;line-height:1;text-transform:uppercase;margin-top:12px;text-wrap:balance}
+.verdict-copy{margin-top:8px;font-weight:500}
+.field{margin-top:16px;display:flex;flex-direction:column;gap:6px}
+.field label{font-family:var(--label);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.field input{font:inherit;padding:12px 14px;border:2px solid var(--ink);background:var(--paper);color:var(--ink)}
+.btn{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;background:var(--ink);color:var(--paper);text-decoration:none;font-family:var(--display);font-size:18px;text-transform:uppercase;padding:16px;border:2px solid var(--ink)}
+.btn:hover{background:#000}
+.btn em{font-style:normal;color:var(--lime)}
+.fine{margin-top:10px;font-size:13px;color:#2e3a22}
+.ghost{margin-top:10px;background:none;border:0;font:inherit;font-size:14px;font-weight:700;text-decoration:underline;cursor:pointer;color:var(--ink)}
+
+/* Links */
+.links{display:flex;flex-direction:column;gap:12px}
+.link{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:14px;background:var(--paper);border:3px solid var(--ink);padding:14px;text-decoration:none;box-shadow:4px 4px 0 var(--ink);transition:transform .08s ease, box-shadow .08s ease}
+.link:hover{background:#fff}
+.link:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--ink)}
+.num{width:44px;height:44px;display:grid;place-items:center;background:var(--ink);color:var(--lime);font-family:var(--display);font-size:16px}
+.link strong{display:block;font-weight:700;font-size:17px;line-height:1.2}
+.link small{display:block;font-size:14px;color:#4a4a4a;margin-top:2px}
+.arrow{font-family:var(--display);font-size:20px}
+.link.hot{background:var(--ink);color:var(--paper)}
+.link.hot .num{background:var(--lime);color:var(--ink)}
+.link.hot small{color:#c9c7bf}
+.link.soon{border-style:dashed;box-shadow:none;cursor:default}
+.link.soon:hover{background:var(--paper)}
+.link.soon:active{transform:none}
+.tag{display:inline-block;margin-left:6px;padding:1px 6px;background:var(--lime);color:var(--ink);font-family:var(--label);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;vertical-align:2px}
+
+/* Services strip */
+.services{border:3px solid var(--ink);padding:16px;background:var(--paper)}
+.services h2{font-family:var(--label);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.services ul{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.services li{border:2px solid var(--ink);padding:6px 10px;font-weight:700;font-size:14px}
+.services li b{font-family:var(--display);font-weight:400}
+
+footer{font-family:var(--label);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--concrete);display:flex;flex-direction:column;gap:4px;text-align:left}
+footer strong{color:var(--ink)}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <div class="top"><span><i class="dot"></i>Taking 3 founding clients</span><span>Surat · NJ</span></div>
+
+  <header class="brand">
+    <h1>Unboring<br><span>People</span></h1>
+    <p>We make brands impossible to ignore.</p>
+    <small>Creative growth agency · Surat ⇄ New Jersey</small>
+  </header>
+
+  <section class="quiz" id="quiz" aria-live="polite">
+    <!-- filled by script -->
+  </section>
+
+  <nav class="links" aria-label="Links">
+    <a class="link hot" id="lnk-audit" href="#" target="_blank" rel="noopener">
+      <span class="num">01</span>
+      <span><strong>Get your free Unboring Audit</strong><small>1 page. 1 crazy idea for your brand. 10 a month.</small></span>
+      <span class="arrow" aria-hidden="true">→</span>
+    </a>
+    <a class="link" id="lnk-founding" href="#" target="_blank" rel="noopener">
+      <span class="num">02</span>
+      <span><strong>Founding client seats <span class="tag">3 only</span></strong><small>Founder pricing in exchange for a case study.</small></span>
+      <span class="arrow" aria-hidden="true">→</span>
+    </a>
+    <a class="link" id="lnk-insta" href="#" target="_blank" rel="noopener">
+      <span class="num">03</span>
+      <span><strong>The Unboring Lab</strong><small>A free crazy idea every Monday and Saturday.</small></span>
+      <span class="arrow" aria-hidden="true">→</span>
+    </a>
+    <div class="link soon" id="lnk-web">
+      <span class="num">04</span>
+      <span><strong>unboringpeople.com <span class="tag">Soon</span></strong><small>The full site is being built. Unboringly, of course.</small></span>
+      <span class="arrow" aria-hidden="true">…</span>
+    </div>
+  </nav>
+
+  <section class="services" aria-labelledby="svc">
+    <h2 id="svc">What we do</h2>
+    <ul>
+      <li><b>Identity</b> · brand strategy</li>
+      <li><b>Ideas</b> · campaigns</li>
+      <li><b>Content</b> · reels &amp; social</li>
+      <li><b>Performance</b> · Meta &amp; Google ads</li>
+      <li><b>Presence</b> · Google, SEO, reviews</li>
+    </ul>
+  </section>
+
+  <footer>
+    <strong>Make boring brands unforgettable.</strong>
+    <span id="foot-contact"></span>
+  </footer>
+</main>
+
+<script>
+/* ===== EDIT THESE ===== */
+var CONFIG = {
+  whatsapp: "917777949735",          // country code + number, digits only
+  instagram: "unboringpeople",       // handle without @
+  website: ""                        // set to "https://unboringpeople.com" once the site is live
+};
+/* ====================== */
+
+var QUESTIONS = [
+  { q: "Your Instagram bio currently says…", a: [
+    ["Something like “Best quality. Best service.”", 2],
+    ["What we sell and where we are", 1],
+    ["A line people actually remember", 0] ]},
+  { q: "Cover your logo on your last 5 posts. Would people still know they're yours?", a: [
+    ["Honestly, no", 2],
+    ["Maybe one or two", 1],
+    ["Instantly", 0] ]},
+  { q: "Put your ads next to your 3 biggest competitors'. They look…", a: [
+    ["Basically the same", 2],
+    ["A bit different", 1],
+    ["Nothing like theirs", 0] ]},
+  { q: "When did a customer last talk about your marketing, not your product?", a: [
+    ["Never, that I know of", 2],
+    ["Once or twice", 1],
+    ["It happens often", 0] ]},
+  { q: "Your go-to marketing move is…", a: [
+    ["Discounts and festival greeting posts", 2],
+    ["Posting regularly, hoping it works", 1],
+    ["Campaigns built around one strong idea", 0] ]},
+  { q: "Your Google reviews are…", a: [
+    ["Few, old, or unanswered", 2],
+    ["Decent, but I rarely reply", 1],
+    ["A steady stream, and we reply to all", 0] ]}
+];
+var MAX = QUESTIONS.length * 2;
+
+var VERDICTS = [
+  { min: 0, max: 3, title: "Suspiciously unboring.", copy: "You're doing a lot right. The next step is making people talk about you without being asked. That's our favourite job." },
+  { min: 4, max: 6, title: "Boring-ish.", copy: "Good business, forgettable marketing. People like you when they find you. Most of them just never find you." },
+  { min: 7, max: 10, title: "Certified boring.", copy: "Good news: this is the easiest kind to fix. Great businesses with boring marketing are exactly who we built this agency for." }
+];
+
+var state = { i: 0, answers: [] };
+var box = document.getElementById("quiz");
+
+function waLink(text){
+  var num = /^\d{8,15}$/.test(CONFIG.whatsapp) ? CONFIG.whatsapp : "";
+  return "https://wa.me/" + num + "?text=" + encodeURIComponent(text);
+}
+function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
+
+function renderIntro(){
+  box.innerHTML =
+    '<div class="eyebrow"><span>The 30-second test</span><span>6 questions</span></div>' +
+    '<h2>Is your brand boring?</h2>' +
+    '<p class="lede">Be honest. Nobody’s watching. Get your Boring Score out of 10.</p>' +
+    '<div class="opts"><button class="opt" id="start" type="button"><strong>Start the test →</strong></button></div>';
+  document.getElementById("start").addEventListener("click", function(){ state.i = 0; state.answers = []; renderQ(); });
+}
+
+function renderQ(){
+  var item = QUESTIONS[state.i];
+  var pct = Math.round(state.i / QUESTIONS.length * 100);
+  var html =
+    '<div class="eyebrow"><span>Question ' + (state.i + 1) + ' of ' + QUESTIONS.length + '</span><span>Is your brand boring?</span></div>' +
+    '<div class="bar" aria-hidden="true"><i style="width:' + pct + '%"></i></div>' +
+    '<div class="q"><h3 id="qtitle">' + esc(item.q) + '</h3><div class="opts" role="group" aria-labelledby="qtitle">';
+  item.a.forEach(function(opt, k){
+    html += '<button class="opt" type="button" data-k="' + k + '">' + esc(opt[0]) + '</button>';
+  });
+  html += '</div></div><button class="back" type="button" id="back"' + (state.i === 0 ? ' hidden' : '') + '>← Previous question</button>';
+  box.innerHTML = html;
+  Array.prototype.forEach.call(box.querySelectorAll(".opt"), function(b){
+    b.addEventListener("click", function(){
+      state.answers[state.i] = item.a[+b.getAttribute("data-k")][1];
+      state.i++;
+      if (state.i < QUESTIONS.length) renderQ(); else renderResult();
+    });
+  });
+  document.getElementById("back").addEventListener("click", function(){ if (state.i > 0){ state.i--; renderQ(); } });
+  var first = box.querySelector(".opt"); if (first) first.focus({preventScroll:true});
+}
+
+function scoreOutOf10(answers){
+  var sum = answers.reduce(function(a,b){ return a + b; }, 0);
+  return Math.round(sum / MAX * 10);
+}
+
+function renderResult(){
+  var s = scoreOutOf10(state.answers);
+  var v = VERDICTS.filter(function(x){ return s >= x.min && s <= x.max; })[0];
+  box.innerHTML =
+    '<div class="eyebrow"><span>Your Boring Score</span><span>Done</span></div>' +
+    '<div class="bar" aria-hidden="true"><i style="width:100%"></i></div>' +
+    '<div class="score"><b>' + s + '</b><span>/10</span></div>' +
+    '<p class="verdict">' + esc(v.title) + '</p>' +
+    '<p class="verdict-copy">' + esc(v.copy) + '</p>' +
+    '<div class="field"><label for="biz">Your business or Instagram handle (optional)</label>' +
+    '<input id="biz" type="text" autocomplete="organization" placeholder="@yourbrand"></div>' +
+    '<a class="btn" id="wa" href="#" target="_blank" rel="noopener"><span>Get my free audit on WhatsApp</span><em>→</em></a>' +
+    '<p class="fine">A playful score, not a scientific one. The real audit is done by a human, free, and you owe us nothing.</p>' +
+    '<button class="ghost" type="button" id="retake">Retake the test</button>';
+  var wa = document.getElementById("wa"), biz = document.getElementById("biz");
+  function update(){
+    var b = biz.value.trim();
+    wa.href = waLink("Hi UNBORING PEOPLE! My Boring Score is " + s + "/10" + (b ? " (" + b + ")" : "") + ". I'd like my free Unboring Audit.");
+  }
+  biz.addEventListener("input", update); update();
+  document.getElementById("retake").addEventListener("click", renderIntro);
+}
+
+/* Static links */
+document.getElementById("lnk-audit").href = waLink("Hi UNBORING PEOPLE! I'd like a free Unboring Audit for my brand.");
+document.getElementById("lnk-founding").href = waLink("Hi UNBORING PEOPLE! Tell me about the founding client seats.");
+document.getElementById("lnk-insta").href = "https://www.instagram.com/" + CONFIG.instagram + "/";
+if (CONFIG.website) {
+  var soon = document.getElementById("lnk-web");
+  var a = document.createElement("a");
+  a.className = "link"; a.href = CONFIG.website; a.target = "_blank"; a.rel = "noopener";
+  a.innerHTML = '<span class="num">04</span><span><strong>unboringpeople.com</strong><small>Everything we do, in one place.</small></span><span class="arrow" aria-hidden="true">→</span>';
+  soon.parentNode.replaceChild(a, soon);
+}
+document.getElementById("foot-contact").textContent = "@" + CONFIG.instagram + (/^\d{8,15}$/.test(CONFIG.whatsapp) ? " · WhatsApp +" + CONFIG.whatsapp : "");
+
+renderIntro();
+</script>
+</body>
+</html>

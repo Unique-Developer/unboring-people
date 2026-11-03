@@ -1,0 +1,20 @@
+---
+import Base from '../layouts/Base.astro';
+import BoringTest from '../components/BoringTest.astro';
+---
+
+<Base
+  title="The Boring Test: how boring is your brand?"
+  description="Six questions. One Boring Score out of 10. Find out how boring your marketing looks next to your competitors, then get a free Unboring Audit from UNBORING PEOPLE."
+>
+  <div class="test-page on-lime">
+    <div class="wrap inner">
+      <BoringTest variant="page" as="h1" />
+    </div>
+  </div>
+</Base>
+
+<style>
+  .test-page { border-bottom: var(--rule); min-height: calc(100svh - 4.25rem); }
+  .inner { padding-block: clamp(2.5rem, 6vw, 5rem) var(--section); }
+</style>

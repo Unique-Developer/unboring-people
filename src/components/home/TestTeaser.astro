@@ -1,0 +1,73 @@
+---
+import { getEntry } from 'astro:content';
+import { primaryCta } from '../../site.config';
+
+const first = (await getEntry('testQuestions', 'q1'))!;
+---
+
+<section class="teaser on-lime" aria-labelledby="test-title">
+  <div class="wrap inner">
+    <div class="pitch">
+      <p class="label">[04] The Boring Test</p>
+      <h2 id="test-title" class="display display-l" data-boring="Get A Free Consultation">How boring is your brand?</h2>
+      <p class="lede">Six questions. About a minute. One Boring Score out of 10, and a free audit if you want one.</p>
+      <p class="label note">A playful score, not a scientific one.</p>
+    </div>
+
+    <!-- The first question, answerable right here. /test picks up the answer from ?q1= -->
+    <div class="q" role="group" aria-labelledby="q1-preview">
+      <p class="label">Question 1 of 6</p>
+      <h3 id="q1-preview" class="display display-s">{first.data.question}</h3>
+      <ul role="list">
+        {first.data.answers.map((a, i) => (
+          <li><a class="opt" href={`${primaryCta.href}?q1=${i}`} data-cursor="test">{a.text}</a></li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .teaser { border-bottom: var(--rule); }
+  .inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3rem;
+    padding-block: var(--section);
+  }
+  .pitch { display: grid; gap: 1.25rem; align-content: start; }
+  .pitch h2 { max-width: 10ch; }
+  .note { opacity: 0.85; }
+  .q {
+    display: grid;
+    gap: 1.25rem;
+    padding: clamp(1.25rem, 3vw, 2.25rem);
+    background: var(--paper);
+    border: var(--rule);
+    box-shadow: var(--shadow);
+    align-self: start;
+  }
+  .q ul { display: grid; gap: 0.85rem; padding: 0; list-style: none; }
+  .opt {
+    display: block;
+    padding: 1rem 1.15rem;
+    border: var(--rule);
+    background: var(--paper);
+    font-weight: 500;
+    font-size: var(--step-1);
+    text-decoration: none;
+    box-shadow: 4px 4px 0 var(--ink);
+    transition: transform var(--fast) var(--ease-snap), box-shadow var(--fast) var(--ease-snap), background var(--fast);
+  }
+  .opt:hover { background: var(--lime); transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
+  .opt:active { transform: translate(4px, 4px); box-shadow: none; }
+
+  @media (min-width: 1000px) {
+    .inner { grid-template-columns: 1fr 1fr; align-items: start; }
+    .q { transform: rotate(1.5deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .opt { transition: none; }
+    .opt:hover { transform: none; }
+  }
+</style>

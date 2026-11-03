@@ -1,0 +1,49 @@
+---
+import { getCollection } from 'astro:content';
+import LabCard from '../LabCard.astro';
+
+const ideas = (await getCollection('lab', ({ data }) => data.featured))
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3);
+---
+
+<section class="lab" aria-labelledby="lab-title">
+  <div class="wrap">
+    <div class="head">
+      <p class="label">[03] The Unboring Lab</p>
+      <h2 id="lab-title" class="display display-l" data-boring="Our Portfolio">Ideas you can steal.</h2>
+      <p class="lede">We don't have a portfolio yet. So here's how we think instead: campaign ideas built for real budgets. Take one. We'd love to make it happen with you.</p>
+    </div>
+    <ul class="grid" role="list">
+      {ideas.map((idea) => <li><LabCard idea={idea} /></li>)}
+    </ul>
+    <a class="btn btn--ink all" href="/lab" data-cursor="steal">Open the Lab <span class="arrow" aria-hidden="true">→</span></a>
+  </div>
+</section>
+
+<style>
+  .lab { padding-block: var(--section); border-bottom: var(--rule); }
+  .head {
+    display: grid;
+    gap: 1.25rem;
+    margin-bottom: 3rem;
+  }
+  .grid {
+    display: grid;
+    gap: 1.75rem;
+    padding: 0;
+    list-style: none;
+  }
+  .all { margin-top: 3rem; }
+  @media (min-width: 760px) {
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1100px) {
+    .head { grid-template-columns: 1fr 1fr; align-items: end; }
+    .head .label { grid-column: 1 / -1; }
+    .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    /* Stagger the cards so the row doesn't read as a SaaS pricing table. */
+    .grid li:nth-child(2) { transform: translateY(2.5rem); }
+    .grid li:nth-child(3) { transform: translateY(-1rem) rotate(1deg); }
+  }
+</style>

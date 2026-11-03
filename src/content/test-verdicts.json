@@ -1,0 +1,32 @@
+[
+  {
+    "id": "unboring",
+    "min": 0,
+    "max": 3,
+    "title": "Suspiciously unboring.",
+    "lines": [
+      "Either you're already doing this right, or you were very kind to yourself.",
+      "A free audit will tell us which. Bring your competitors' pages too."
+    ]
+  },
+  {
+    "id": "boringish",
+    "min": 4,
+    "max": 6,
+    "title": "Boring-ish.",
+    "lines": [
+      "There's something good in there, buried under the safe stuff.",
+      "That's the easiest kind of brand to fix. Let's dig it out."
+    ]
+  },
+  {
+    "id": "certified",
+    "min": 7,
+    "max": 10,
+    "title": "Certified boring.",
+    "lines": [
+      "Good news: there's nowhere to go but memorable.",
+      "Bad news: your competitors can take this test too."
+    ]
+  }
+]

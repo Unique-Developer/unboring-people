@@ -1,0 +1,57 @@
+---
+/** The founding seats. Counts come straight from site.config.ts, so there's no fake scarcity. */
+import { site } from '../site.config';
+
+const { totalSeats, taken } = site.founding;
+const seats = Array.from({ length: totalSeats }, (_, i) => taken[i] ?? null);
+const article = (word: string) => (/^[aeiou]/i.test(word) ? 'an' : 'a');
+---
+
+<ol class="seats" role="list" aria-label={`${taken.length} of ${totalSeats} founding seats taken`}>
+  {seats.map((seat, i) => (
+    <li class:list={['seat', { taken: seat }]}>
+      <svg viewBox="0 0 120 150" aria-hidden="true" focusable="false">
+        <path class="chair" d="M24 8h72v62H24z M14 70h92v18H14z M22 88v56 M98 88v56 M22 118h76" />
+        {seat && <text x="60" y="48" text-anchor="middle" class="num">{i + 1}</text>}
+        {!seat && <text x="60" y="48" text-anchor="middle" class="num open">?</text>}
+      </svg>
+      <p class="caption label">
+        <span class="n">Seat {i + 1}</span>
+        {seat
+          ? <span>Taken: {seat.name ?? `${article(seat.industry)} ${seat.industry}`} in {seat.city}</span>
+          : <span>Open</span>}
+      </p>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .seats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(0.75rem, 3vw, 3rem);
+    padding: 0;
+    list-style: none;
+  }
+  .seat { display: grid; gap: 0.75rem; justify-items: center; text-align: center; }
+  svg { width: 100%; max-width: 13rem; overflow: visible; }
+  .chair {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 6;
+    stroke-dasharray: 10 8;
+    stroke-linejoin: miter;
+  }
+  .taken .chair {
+    fill: var(--lime);
+    stroke-dasharray: none;
+  }
+  .num {
+    font-family: var(--font-display);
+    font-size: 40px;
+    fill: currentColor;
+  }
+  .num.open { opacity: 0.35; }
+  .caption { display: grid; gap: 0.2rem; }
+  .n { opacity: 0.7; }
+</style>

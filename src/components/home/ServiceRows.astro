@@ -1,0 +1,88 @@
+---
+import { getCollection } from 'astro:content';
+
+const services = (await getCollection('services')).sort((a, b) => a.data.number.localeCompare(b.data.number));
+---
+
+<section class="services" aria-labelledby="services-title">
+  <div class="wrap head">
+    <p class="label">[02] What we do</p>
+    <h2 id="services-title" class="display display-l" data-boring="Our Services">Five ways to stop being ignored.</h2>
+  </div>
+
+  <ol class="rows" role="list">
+    {services.map((s) => (
+      <li>
+        <a class="row" href={`/services#${s.id}`} data-cursor="read">
+          <span class="wrap row-inner">
+            <span class="num label" aria-hidden="true">{s.data.number}</span>
+            <span class="name display">{s.data.name}</span>
+            <span class="detail">
+              <span class="one">{s.data.oneLiner}</span>
+              <span class="inc label">{s.data.includes.slice(0, 4).join(' / ')}</span>
+            </span>
+            <span class="go" aria-hidden="true">→</span>
+          </span>
+        </a>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<style>
+  .services { padding-top: var(--section); border-bottom: var(--rule); }
+  .head {
+    display: grid;
+    gap: 1.25rem;
+    padding-bottom: 3rem;
+  }
+  .head h2 { max-width: 14ch; }
+  .rows { padding: 0; list-style: none; }
+  .rows li { border-top: var(--rule); }
+  .row {
+    display: block;
+    text-decoration: none;
+    background: linear-gradient(var(--lime), var(--lime)) no-repeat 0 0 / 0% 100%;
+    transition: background-size var(--med) var(--ease-snap);
+  }
+  .row:hover, .row:focus-visible { background-size: 100% 100%; }
+  .row-inner {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    gap: 0.5rem 1rem;
+    align-items: baseline;
+    padding-block: 1.5rem;
+  }
+  .name {
+    font-size: clamp(1.9rem, 0.6rem + 6vw, 5.5rem);
+    line-height: 0.9;
+  }
+  .detail {
+    grid-column: 2;
+    display: grid;
+    gap: 0.4rem;
+  }
+  .one { font-weight: 500; font-size: var(--step-1); line-height: 1.3; }
+  .inc { color: var(--ink-soft); }
+  .go { display: none; }
+
+  @media (min-width: 1000px) {
+    .row-inner {
+      grid-template-columns: 4rem minmax(0, 1.4fr) minmax(0, 1fr) 3rem;
+      align-items: center;
+      padding-block: 2rem;
+    }
+    .detail { grid-column: auto; }
+    .go {
+      display: block;
+      font-family: var(--font-display);
+      font-size: var(--step-3);
+      justify-self: end;
+      transition: transform var(--med) var(--ease-snap);
+    }
+    .row:hover .go { transform: translateX(0.4rem) rotate(-45deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .row, .go { transition: none; }
+  }
+</style>

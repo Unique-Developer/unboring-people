@@ -1,0 +1,52 @@
+[
+  {
+    "id": "identity",
+    "number": "01",
+    "name": "Unboring Identity",
+    "oneLiner": "Know what you stand for before you say anything.",
+    "includes": ["Brand positioning", "Brand storytelling", "Brand strategy", "Voice and messaging", "Visual identity direction", "Competitor differentiation"],
+    "youGet": "A positioning you can say in one breath, a voice guide your whole team can actually use, and a visual direction that looks like nobody else on your street.",
+    "forWho": "Businesses that sell something good but describe it the same way as everyone else.",
+    "exampleIdea": "A jewellery store stops saying \"finest craftsmanship\" and starts saying what only it can: \"Three generations. One goldsmith who still says no.\""
+  },
+  {
+    "id": "ideas",
+    "number": "02",
+    "name": "Unboring Ideas",
+    "oneLiner": "One strong idea beats fifty festival posts.",
+    "includes": ["Creative campaigns", "Unconventional ad concepts", "Guerrilla marketing", "Brand activations", "Influencer collaborations", "Campaign planning and execution"],
+    "youGet": "Campaigns built around a single idea people repeat to their friends, planned down to the budget, the timeline and the number we'll judge it by.",
+    "forWho": "Brands launching something, opening somewhere, or tired of discounting to get noticed.",
+    "exampleIdea": "A café leaves one item on its menu unnamed and lets customers name it. The winner's name stays on the board for a year."
+  },
+  {
+    "id": "content",
+    "number": "03",
+    "name": "Unboring Content",
+    "oneLiner": "Posts people stop for. Not posts you post for.",
+    "includes": ["Social media strategy", "Instagram management", "Reels and video production", "Posts and carousels", "Content calendars", "Brand communication"],
+    "youGet": "A monthly plan with a point of view, reels shot for the first second not the last, and a calendar that leaves room for ideas instead of filler.",
+    "forWho": "Brands that post every day and still feel invisible.",
+    "exampleIdea": "A physio clinic swaps \"5 tips for back pain\" for a reel series filmed from the patient's chair: what the first visit actually feels like."
+  },
+  {
+    "id": "performance",
+    "number": "04",
+    "name": "Unboring Performance",
+    "oneLiner": "Creative that gets noticed. Ads that get counted.",
+    "includes": ["Meta Ads", "Google Ads", "Lead generation", "Retargeting", "Ad creatives", "Conversion optimisation", "Campaign analytics"],
+    "youGet": "Ad accounts set up properly, creative tested against creative, tracking you can trust, and a plain-language report on what your money did.",
+    "forWho": "Businesses spending on ads with no clear idea which rupee or dollar is working.",
+    "exampleIdea": "A real estate project tests three ads: the floor plan, the view, and a resident's 15-second walk to the nearest chai stall. We keep whichever books more site visits."
+  },
+  {
+    "id": "presence",
+    "number": "05",
+    "name": "Unboring Presence",
+    "oneLiner": "Be the obvious answer when someone searches.",
+    "includes": ["Google Business Profile", "Local SEO", "Review strategy", "Website improvement", "Reputation management", "Digital brand presence"],
+    "youGet": "A Google profile that looks alive, a steady, honest flow of reviews, replies that sound human, and a website that answers the question people actually came with.",
+    "forWho": "Local businesses whose customers find them on Google Maps before they find them anywhere else.",
+    "exampleIdea": "A salon replies to every review, good or bad, in its own voice, and pins the funniest reply as a post every Friday."
+  }
+]
