@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
 import Seats from '../components/Seats.astro';
+import BrandZero from '../components/BrandZero.astro';
 import { site, primaryCta, whatsappLink, mailtoLink, emailLine } from '../site.config';
 
 const faqOrder = ['pricing', 'why-three', 'the-catch', 'guarantee', 'ad-budget', 'term', 'new'];
@@ -63,6 +64,8 @@ const steps = [
       </div>
     </div>
   </section>
+
+  <BrandZero label="Meanwhile" compact />
 
   <section class="how on-lime" aria-labelledby="how-title">
     <div class="wrap how-inner">

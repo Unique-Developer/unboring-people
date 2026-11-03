@@ -46,6 +46,18 @@ export const site = {
     taken: [] as { industry: string; city: string; name?: string }[],
   },
 
+  /**
+   * Brand zero: a business we own and market ourselves. Shown as our own brand, never as a client,
+   * and never counted as a founding seat.
+   */
+  brandZero: {
+    name: 'Lumin Art',
+    what: 'Custom architectural and decorative lighting',
+    forWho: 'architects, interior designers and premium homes',
+    where: 'Surat, with projects across India',
+    instagram: 'luminart_lights',
+  },
+
   forms: {
     // Netlify Forms picks up any <form data-netlify="true" name="..."> at build time. No endpoint to set.
     talkFormName: 'talk',
