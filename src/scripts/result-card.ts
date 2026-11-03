@@ -56,6 +56,17 @@ function fit(ctx: CanvasRenderingContext2D, text: string, family: string, start:
   return size;
 }
 
+/** The real logo artwork, loaded once. Falls back to typed text if it can't load. */
+let logoPromise: Promise<HTMLImageElement | null> | undefined;
+function logoImage() {
+  return (logoPromise ??= new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = '/brand/logo-stacked-on-dark.svg';
+  }));
+}
+
 export async function drawCard(canvas: HTMLCanvasElement, { score, title, handle }: CardInput) {
   await fontsReady();
   canvas.width = W;
@@ -67,11 +78,17 @@ export async function drawCard(canvas: HTMLCanvasElement, { score, title, handle
   ctx.fillStyle = C.ink;
   ctx.fillRect(0, 0, W, H);
 
-  // Top row: wordmark + label
-  ctx.fillStyle = C.paper;
-  ctx.font = `400 46px ${DISPLAY}`;
-  ctx.fillText('UNBORING', PAD, PAD + 40);
-  ctx.fillText('PEOPLE', PAD, PAD + 88);
+  // Top row: logo + label
+  const logo = await logoImage();
+  if (logo) {
+    const lw = 330;
+    ctx.drawImage(logo, PAD - 6, PAD - 18, lw, (lw * logo.naturalHeight) / logo.naturalWidth);
+  } else {
+    ctx.fillStyle = C.paper;
+    ctx.font = `400 46px ${DISPLAY}`;
+    ctx.fillText('UNBORING', PAD, PAD + 40);
+    ctx.fillText('PEOPLE', PAD, PAD + 88);
+  }
 
   ctx.font = `700 28px ${LABEL}`;
   ctx.textAlign = 'right';

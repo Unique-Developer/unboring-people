@@ -78,8 +78,13 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
     min-height: 4.25rem;
   }
   .home {
+    display: flex;
     text-decoration: none;
     flex-shrink: 0;
+  }
+  .home :global(.logo) { height: 2.6rem; }
+  @media (min-width: 1024px) {
+    .home :global(.logo) { height: 3rem; }
   }
 
   /* Desktop */

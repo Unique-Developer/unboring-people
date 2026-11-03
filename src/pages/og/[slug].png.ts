@@ -34,6 +34,15 @@ const INK = '#111111';
 const LIME = '#B8F279';
 const PAPER = '#F5F3EB';
 
+// The real logo artwork, rasterised once and embedded as a PNG data URI.
+const LOGO_W = 300;
+let logo: Promise<string> | undefined;
+const logoDataUri = () =>
+  (logo ??= readFile(join(process.cwd(), 'public', 'brand', 'logo-stacked-on-dark.svg'), 'utf8').then((svg) => {
+    const png = new Resvg(svg, { fitTo: { mode: 'width', value: LOGO_W * 2 } }).render().asPng();
+    return `data:image/png;base64,${Buffer.from(png).toString('base64')}`;
+  }));
+
 // Tiny element helper so the layout reads like markup.
 const h = (type: string, style: Record<string, unknown>, children?: unknown) => ({ type, props: { style, children } });
 
@@ -47,12 +56,9 @@ export const GET: APIRoute = async ({ params }) => {
       position: 'absolute', right: -200, top: 110, width: 440, height: 440, borderRadius: 999, background: LIME,
       display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 40, fontFamily: 'Archivo Black', fontSize: 150, color: INK,
     }, '!?'),
-    // Top row
-    h('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '56px 64px 0' }, [
-      h('div', { display: 'flex', flexDirection: 'column', fontFamily: 'Archivo Black', fontSize: 34, lineHeight: 0.9 }, [
-        h('span', {}, 'UNBORING'),
-        h('span', {}, 'PEOPLE'),
-      ]),
+    // Top row: the logo
+    h('div', { display: 'flex', padding: '48px 56px 0' }, [
+      { type: 'img', props: { src: await logoDataUri(), width: LOGO_W, height: Math.round((LOGO_W * 1912) / 5616) } },
     ]),
     // Title
     h('div', { display: 'flex', flexDirection: 'column', padding: '0 64px', marginTop: 'auto', marginBottom: 40, maxWidth: 900 }, [

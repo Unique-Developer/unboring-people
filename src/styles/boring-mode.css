@@ -68,7 +68,7 @@ html.boring-mode {
 .boring-mode .never .txt::after { transform: scaleX(0) !important; }
 
 .boring-mode .sticker { filter: grayscale(1); }
-.boring-mode .wordmark { font-weight: 300; color: #dfe4ee; }
+.boring-mode .wordmark .boring-text { font-size: clamp(2rem, 8vw, 6rem); font-weight: 300; color: #dfe4ee; }
 
 /* The footer goes light in boring mode, so its paper-coloured links need a colour that shows. */
 .boring-mode .site-footer a,

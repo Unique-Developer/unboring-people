@@ -2,6 +2,7 @@
 import BoringButton from './BoringButton.astro';
 import Bridge from './Bridge.astro';
 import BoringMode from './BoringMode.astro';
+import Logo from './Logo.astro';
 import { site, nav, primaryCta, whatsappLink, defaultWhatsappMessage, mailtoLink, emailLine } from '../site.config';
 
 const email = mailtoLink('Bored of my marketing');
@@ -53,7 +54,7 @@ const { home, away } = site.places;
   </div>
 
   <div class="wordmark-wrap" aria-hidden="true">
-    <p class="wordmark display">UNBORING PEOPLE</p>
+    <Logo on="dark" layout="horizontal" loading="lazy" class="wordmark" />
   </div>
 
   <div class="wrap legal">
@@ -118,17 +119,11 @@ const { home, away } = site.places;
 
   .wordmark-wrap {
     border-block: 3px solid var(--paper);
-    padding-block: 0.5rem 0;
+    padding: clamp(1.5rem, 4vw, 3.5rem) var(--gutter);
   }
-  /* Sized so the wordmark runs exactly gutter to gutter at any width. 10.35em is its measured width. */
-  .wordmark {
-    font-size: calc((100vw - 2 * var(--gutter)) / 10.35);
-    line-height: 0.8;
-    white-space: nowrap;
-    padding-left: var(--gutter);
-    color: var(--paper);
-    transform: translateY(0.08em);
-  }
+  /* The horizontal logo, running gutter to gutter at any width. */
+  .wordmark-wrap :global(.wordmark) { display: block; width: 100%; }
+  .wordmark-wrap :global(.wordmark img) { width: 100%; height: auto; }
 
   .legal {
     display: flex;

@@ -31,6 +31,7 @@ Handy URLs while testing:
 | Founding FAQ | `src/content/founding-faq.json` |
 | Case studies (route switched off) | `src/content/work/*.md` |
 | Colours, type scale, borders | `src/styles/tokens.css` |
+| Logo files used by the site | `public/brand/` (copied from `Brand Design Reference/Logo`) |
 | What boring mode looks like | `src/styles/boring-mode.css` |
 | Share-image titles | `ogPages` in `src/pages/og/[slug].png.ts` |
 
@@ -38,6 +39,8 @@ Handy URLs while testing:
 - **A founding seat is taken:** add `{ industry: 'café', city: 'Surat' }` to `founding.taken` in `site.config.ts`. Add `name: '...'` only if the client agreed to be named.
 - **Turn on analytics:** paste the GA4 ID (`G-...`) and Meta Pixel ID into `site.config.ts`. The cookie notice and the "Cookie settings" footer link appear automatically; nothing loads until a visitor taps "Fine".
 - **Turn on /work:** see the instructions at the top of `src/pages/_work.astro`. Real, client-approved numbers only.
+
+Logo files, every variation, colours and usage rules: see [Brand Design Reference](Brand%20Design%20Reference/README.md).
 
 Anything in `[SQUARE BRACKETS]` is a placeholder. Lines marked `COPY: check` are copy to confirm.
 

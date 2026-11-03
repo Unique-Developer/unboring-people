@@ -1,40 +1,38 @@
 ---
+/**
+ * The UNBORING PEOPLE logo, from /public/brand (generated from "Brand Design Reference/Logo").
+ * In boring mode the artwork is swapped for plain text, because a boring agency would never have this logo.
+ */
 interface Props {
-  /** Show the "!?" mark before the wordmark. */
-  mark?: boolean;
+  /** Which ground it sits on. */
+  on?: 'light' | 'dark';
+  layout?: 'stacked' | 'horizontal';
+  class?: string;
+  /** Loading hint; the header logo is eager, everything below the fold is lazy. */
+  loading?: 'eager' | 'lazy';
 }
-const { mark = true } = Astro.props;
+const { on = 'light', layout = 'stacked', class: className, loading = 'eager' } = Astro.props;
+const src = `/brand/logo-${layout}-on-${on}.svg`;
+// Intrinsic ratios of the trimmed artwork, so the image reserves its space before it loads (no layout shift).
+const size = layout === 'stacked' ? { width: 5616, height: 1912 } : { width: 9932, height: 1164 };
 ---
 
-<span class="logo">
-  {mark && <span class="mark-dot" aria-hidden="true">!?</span>}
-  <span class="word">UNBORING<br class="br" /> PEOPLE</span>
+<span class:list={['logo', `logo--${layout}`, className]}>
+  <img src={src} alt="UNBORING PEOPLE" width={size.width} height={size.height} loading={loading} decoding="async" />
+  <span class="boring-text" aria-hidden="true">Unboring People</span>
 </span>
 
 <style>
-  .logo {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    font-family: var(--font-display);
-    text-transform: uppercase;
-    line-height: 0.85;
-    letter-spacing: -0.02em;
-  }
-  .mark-dot {
-    display: grid;
-    place-items: center;
-    width: 2.4rem;
-    height: 2.4rem;
-    border-radius: 50%;
-    background: var(--lime);
-    color: var(--ink);
-    font-size: 1rem;
-    letter-spacing: -0.04em;
-    border: 2px solid var(--ink);
-  }
-  .word { font-size: 1.15rem; }
-  @media (max-width: 380px) {
-    .word { font-size: 1rem; }
+  .logo { display: inline-flex; align-items: center; line-height: 1; }
+  img { display: block; height: 100%; width: auto; max-width: 100%; }
+  .boring-text { display: none; }
+
+  :global(.boring-mode) .logo img { display: none; }
+  :global(.boring-mode) .logo .boring-text {
+    display: inline;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    font-size: 1.15rem;
+    color: #2f6fde;
   }
 </style>
