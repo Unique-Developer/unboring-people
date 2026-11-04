@@ -42,21 +42,19 @@ export const site = {
      * Add one entry per signed founding client. The seat shows "Taken: a café in Surat".
      * Add `name` only if the client agreed to be named publicly.
      * Example: { industry: 'café', city: 'Surat' }
-     * `own: true` marks a brand we own, so the seat says so instead of passing it off as a client.
      */
-    taken: [{ industry: 'lighting', city: 'Surat', name: 'Lumin Art', own: true }] as {
+    taken: [{ industry: 'lighting', city: 'Surat', name: 'Lumin Art' }] as {
       industry: string;
       city: string;
       name?: string;
-      own?: boolean;
     }[],
   },
 
   /**
-   * Brand zero: a business we own and market ourselves. Shown as our own brand, never as a client.
-   * It also holds founding seat 1 (see founding.taken, marked own: true).
+   * The client featured on the homepage and /founding. Facts only: who they are and what they make.
+   * Add results here only when they're real, measured and approved.
    */
-  brandZero: {
+  client: {
     name: 'Lumin Art',
     what: 'Custom architectural and decorative lighting',
     forWho: 'architects, interior designers and premium homes',

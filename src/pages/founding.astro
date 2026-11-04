@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
 import Seats from '../components/Seats.astro';
-import BrandZero from '../components/BrandZero.astro';
+import ClientSpotlight from '../components/ClientSpotlight.astro';
 import { site, primaryCta, whatsappLink, mailtoLink, emailLine } from '../site.config';
 
 const faqOrder = ['pricing', 'why-three', 'the-catch', 'guarantee', 'ad-budget', 'term', 'new'];
@@ -46,7 +46,7 @@ const steps = [
     <div class="wrap seats-inner">
       <h2 id="seats-title" class="display display-m"><span class="mark">{taken.length} of {totalSeats} taken.</span> {open} open.</h2>
       <Seats />
-      <p class="label muted">Seat 1 is our own brand, Lumin Art, and we'd rather say so than pretend. When a client takes a seat, it shows here with their industry and city.</p>
+      <p class="label muted">This number is real. When a seat goes, it shows here.</p>
     </div>
   </section>
 
@@ -65,7 +65,7 @@ const steps = [
     </div>
   </section>
 
-  <BrandZero label="Meanwhile" compact />
+  <ClientSpotlight label="Seat 1" compact />
 
   <section class="how on-lime" aria-labelledby="how-title">
     <div class="wrap how-inner">

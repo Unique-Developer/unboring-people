@@ -1,38 +1,39 @@
 ---
-/**
- * Brand zero: our own company, Lumin Art. Presented as ours, with the relationship stated plainly,
- * so it reads as proof we practise what we sell, not as a borrowed client logo.
- */
+/** The client in founding seat 1, from site.config.ts. Who they are and what they make; no invented results. */
 import { site } from '../site.config';
 
 interface Props {
-  /** Section label, e.g. "[07] Brand zero". */
+  /** Section label, e.g. "[07] Founding client". */
   label?: string;
   compact?: boolean;
 }
-const { label = 'Brand zero', compact = false } = Astro.props;
-const b = site.brandZero;
-const insta = `https://instagram.com/${b.instagram}`;
+const { label = 'Founding client', compact = false } = Astro.props;
+const c = site.client;
+const insta = `https://instagram.com/${c.instagram}`;
+const { totalSeats, taken } = site.founding;
+const left = totalSeats - taken.length;
 ---
 
 <section class:list={['bz', 'on-ink', { compact }]} aria-labelledby="bz-title">
   <div class="wrap inner">
     <div class="copy">
       <p class="label lime">{label}</p>
-      <h2 id="bz-title" class="display display-l" data-boring="Our Valued Clients">We test on ourselves first.</h2>
+      <h2 id="bz-title" class="display display-l" data-boring="Our Valued Clients">Seat 1 is taken.</h2>
       <p class="lede">
-        {b.name} is our own company: {b.what.toLowerCase()} for {b.forWho}, from {b.where}. Every idea we pitch you gets
-        tried on {b.name} first, with our own money on the line.
+        {c.name} makes {c.what.toLowerCase()} for {c.forWho}, from {c.where}. They're our first founding client.{' '}
+        {left === 0 ? 'All seats are taken.' : `${left} ${left === 1 ? 'seat' : 'seats'} left.`}
       </p>
-      <p class="label muted">Full disclosure: same owners. It holds founding seat 1, and we say so.</p>
+      {!compact && left > 0 && (
+        <a class="label more" href="/founding" data-cursor="sit">Take seat {taken.length + 1} <span aria-hidden="true">→</span></a>
+      )}
     </div>
 
     <a class="card" href={insta} rel="noopener" data-cursor="look">
-      <span class="label tag">Already running</span>
-      <span class="display name">{b.name}</span>
-      <span class="what">{b.what}.</span>
-      <span class="label meta">{b.where}</span>
-      <span class="label go">@{b.instagram} on Instagram <span aria-hidden="true">→</span></span>
+      <span class="label tag">Founding client</span>
+      <span class="display name">{c.name}</span>
+      <span class="what">{c.what}.</span>
+      <span class="label meta">{c.where}</span>
+      <span class="label go">@{c.instagram} on Instagram <span aria-hidden="true">→</span></span>
     </a>
   </div>
 </section>
@@ -49,6 +50,15 @@ const insta = `https://instagram.com/${b.instagram}`;
   .lime { color: var(--lime); }
   .copy { display: grid; gap: 1.25rem; align-content: start; }
   .copy h2 { max-width: 12ch; }
+  .more {
+    justify-self: start;
+    color: var(--paper);
+    text-decoration: underline;
+    text-decoration-color: var(--lime);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 0.25em;
+  }
+  .more:hover { color: var(--lime); }
 
   .card {
     display: grid;
