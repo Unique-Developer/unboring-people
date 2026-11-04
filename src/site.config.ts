@@ -21,7 +21,7 @@ export const site = {
     whatsappNumber: '917777949735', // wa.me format: country code + number, no spaces or plus
     whatsappDisplay: '+91 77779 49735',
     email: 'bored@unboringpeople.com',
-    instagram: 'unboringpeople',
+    instagram: 'unboring.people',
   },
 
   places: {
